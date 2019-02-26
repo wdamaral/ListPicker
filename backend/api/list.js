@@ -2,7 +2,7 @@ const Promise = require('bluebird')
 
 module.exports = app => {
     const { existsOrError, notExistsOrError, isValidID, isNumber } = app.api.validation
-    //const { getByList } = app.api.listItems
+    const { List, ListItem } = app.models.index
     
     const save = (req, res) => {
         const list = { ...req.body }
@@ -21,8 +21,6 @@ module.exports = app => {
             return res.status(400).send(msg)
         }
         
-        let List = app.models.index.List
-        let ListItem = app.models.index.ListItem
         let listItems = list.listItems
         delete list.listItems
         if(list.id) {
@@ -64,16 +62,15 @@ module.exports = app => {
             try {
                 isValidID(req.params.id, "ID not valid.")
     
-                const listPicker = await app.db('list')
-                    .select('pickerId')
+                const listPicker = await List
+                    .fetch('pickerId')
                     .where({ id: req.params.id })
                     notExistsOrError(listPicker, 'List cannot be deleted. A picker has picked it.')
                 
-                const rowsDeleted = await app.db('lists')
-                .where({ id: req.params.id }).del()
+                const rowsDeleted = await new List({ id: req.params.id }).destroy()
                 
                 try {
-                    existsOrError(rowsDeleted, 'List not found.')
+                    existsOrError(rowsDeleted.message, 'List not found.')
                 } catch(msg) {
                     return res.status(400).send(msg)
                 }
