@@ -9,9 +9,12 @@ consign()
     .then('./config/middlewares.js')
     .then('./api/validation.js')
     .then('/api')
+    .then('./bookshelf.js')
+    .then('./models/index.js')
     .then('./config/routes.js')
     .into(app)
 
 app.listen(3000, () => {
+    // console.log(app.models)
     console.log('Backend running...')
 })

@@ -1,5 +1,5 @@
 module.exports = app => {
-    const { existsOrError, notExistsOrError, numberOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, isValidID } = app.api.validation
 
     const save = (req, res) => {
         const store = { ...req.body }
@@ -29,7 +29,7 @@ module.exports = app => {
 
     const remove = async (req, res) => {
         try {
-            numberOrError(req.params.id, "ID not valid.")
+            isValidID(req.params.id, "ID not valid.")
 
             const lists = await app.db('lists')
                 .where({ storeId: req.params.id })
@@ -53,7 +53,7 @@ module.exports = app => {
 
     const getById = (req, res) => {
         try {
-            numberOrError(req.params.id, 'ID not valid.')
+            isValidID(req.params.id, 'ID not valid.')
             app.db('stores')
                 .select('id', 'name', 'description', 'imageUrl')
                 .where({ id: req.params.id }).first()

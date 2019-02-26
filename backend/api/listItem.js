@@ -1,6 +1,5 @@
-//const queries = require('./queries')
 module.exports = app => {
-    const { existsOrError, notExistsOrError, numberOrError } = app.api.validation
+    const { existsOrError, isValidID } = app.api.validation
 
     const save = (req, res) => {
         const listItem = { ...req.body }
@@ -63,39 +62,29 @@ module.exports = app => {
                 .then(lists => res.json({ data: lists, count, limit }))
                 .catch(err => res.status(500).send(err))
         }
-
-        // const getByUserId = (req, res) => {
-        //     app.db('lists')
-
-        //         .then(lists => res.json(lists))
-        //         .catch(err => res.status(500).send(err))
-        // }
     
-        const getById = (req, res) => {
-            try {
-                numberOrError(req.params.id, 'ID not valid.')
-                app.db('lists')
-                    .where({ id: req.params.id }).first()
-                    .then(list => res.json(list))
-                    .catch(err => res.status(500).send(err))
-            } catch(msg) {
-                return res.status(400).send(msg)
-            }
-        }
+        // const getById = (req, res) => {
+        //     try {
+        //         numberOrError(req.params.id, 'ID not valid.')
+        //         app.db('lists')
+        //             .where({ id: req.params.id }).first()
+        //             .then(list => res.json(list))
+        //             .catch(err => res.status(500).send(err))
+        //     } catch(msg) {
+        //         return res.status(400).send(msg)
+        //     }
+        // }
 
-        const getByList = (req, res) => {
+        const getByListId = (req, res) => {
             const listId = req.params.id
             const page = req.query.page || 1
-            //const lists = await app.db.raw(queries.listsWithItems, listId)
-            //const ids = lists.rows.map(c => c.id)
 
             try {
-                numberOrError(params.id, 'ID is not valid')
-                app.db(listItems)
-                    .limit(limit)
-                    .offset(page * limit - limit)
-                    .where({ id: listId })
-                    .then(listItems => res.json(listItems))
+                isValidID(listId, 'ID is not valid')
+                app.models.index.ListItem
+                    .query(qb => qb.where('listId', '=', listId))
+                    .fetchPage({ pageSize: 10, page })
+                    .then(items => res.status(200).json(items))
                     .catch(err => res.status(500).send(err))
             } catch(msg) {
                 return res.status(400).send(msg)
@@ -103,5 +92,5 @@ module.exports = app => {
         }
 
     
-        return { save, remove, get, getById, getByList}
+        return { save, remove, get, getById, getByListId}
 }

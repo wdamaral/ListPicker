@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, numberOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidID } = app.api.validation
+    //const { User } = require('./models')
     
     
     const encryptPassword = password => {
@@ -30,8 +31,11 @@ module.exports = app => {
             equalsOrError(user.password, user.confirmPassword,
                 'Passwords do not match')
 
-            const userFromDB = await app.db('users')
-                .where({ email: user.email }).first()
+            // const userFromDB = await app.db('users')
+            //     .where({ email: user.email }).first()
+            const userFromDB = await app.models.index.User
+                                .where({ email: user.email })
+                                .fetch()
             if(!user.id) {
                 notExistsOrError(userFromDB, 'User already exists')
             }
@@ -44,35 +48,53 @@ module.exports = app => {
         delete user.confirmPassword
 
         if(user.id) {
-            app.db('users')
-                .update(user)
+            // app.db('users')
+            //     .update(user)
+            //     .where({ id: user.id })
+            //     .then(_ => res.status(204).send())
+            //     .catch(err => res.status(500).send(err))
+
+                app.models.index.User
+                .forge(user)
                 .where({ id: user.id })
+                .save()
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            app.db('users')
-                .insert(user)
+            // app.db('users')
+            //     .insert(user)
+            //     .then(_ => res.status(204).send())
+            //     .catch(err => res.status(500).send(err))
+            app.models.index.User
+                .forge(user)
+                .save()
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         }
     }
 
     const get = (req, res) => {
-        app.db('users')
-            .select('id', 'firstName', 'lastName', 'email', 'admin')
-            .then(users => res.json(users))
+        //  app.db('users')
+        //      .select('id', 'firstName', 'lastName', 'email', 'admin')
+        //      .then(users => res.json(users))
+        //      .catch(err => res.status(500).send(err))
+
+        app.models.index.User
+            .fetchAll({columns: ['id', 'email', 'firstName', 'lastName']})
+            .then(users => res.status(200).json(users))
             .catch(err => res.status(500).send(err))
     }
 
     const getById = (req, res) => {
         try {
-            numberOrError(req.params.id, 'ID not valid.')
-            app.db('users')
-                .select('id', 'firstName', 'lastName', 'phoneNumber', 'street', 
-                        'unit', 'city', 'province', 'postalCode', 'email', 'admin', 'createdAt', 'updatedAt')
-                .where({ id: req.params.id }).first()
-                .then(user => res.json(user))
+            isValidID(req.params.id, 'ID not valid.')
+            app.models.index.User
+                .where('id', req.params.id)
+                .fetch({columns: ['id', 'firstName', 'lastName', 'phoneNumber', 'street', 
+                'unit', 'city', 'province', 'postalCode', 'email', 'admin', 'createdAt', 'updatedAt']})
+                .then(user => res.status(200).json(user))
                 .catch(err => res.status(500).send(err))
+
         } catch(msg) {
             return res.status(400).send(msg)
         }

@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
       table.timestamp('updatedAt')
       table.integer('storeId').references('id')
             .inTable('stores')
-      table.integer('userId').references('id')
+      table.integer('ownerId').references('id')
             .inTable('users')
       table.integer('pickerId').references('id')
             .inTable('users')

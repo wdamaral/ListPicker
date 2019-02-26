@@ -19,13 +19,20 @@ module.exports = app => {
         if(valueA !== valueB) throw msg
     }
 
-    function numberOrError(value, msg) {
+    function isValidID(value, msg) {
         let rgx = new RegExp("^[1-9][0-9]*")
         if(!rgx.test(value)) throw msg
+    }
+
+    function isNumber(value, msg) {
+        if(isNaN(value)) throw msg
+        if(value <= 0) throw msg
     }
     
     return { existsOrError, 
         notExistsOrError, 
         equalsOrError, 
-        numberOrError }
+        isValidID,
+        isNumber 
+    }
 }
