@@ -50,20 +50,32 @@ module.exports = app => {
             }
     }
 
-    const getByListId = (req, res) => {
-        const listId = req.params.id
-        const page = req.query.page || 1
+    // const getByListId = (req, res) => {
+    //     const listId = req.params.id
+    //     const page = req.query.page || 1
 
-        try {
-            isValidID(listId, 'ID is not valid')
-            ListItem
-                .query(qb => qb.where('listId', '=', listId))
-                .fetchPage({ pageSize: 10, page })
-                .then(items => res.status(200).json({items: items, pagination: items.pagination}))
-                .catch(err => res.status(500).send(err))
-        } catch(msg) {
-            return res.status(400).send(msg)
-        }
+    //     try {
+    //         isValidID(listId, 'ID is not valid')
+    //         ListItem
+    //             .query(qb => qb.where('listId', '=', listId))
+    //             .fetchPage({ pageSize: 10, page })
+    //             .then(items => res.status(200).json({items: items, pagination: items.pagination}))
+    //             .catch(err => res.status(500).send(err))
+    //     } catch(msg) {
+    //         return res.status(400).send(msg)
+    //     }
+    // }
+
+    const getByListId = (listId) => {
+        //const listId = req.params.id
+            return new Promise((resolve, reject) => {
+                return ListItem
+                    .query(qb => qb.where('listId', '=', listId))
+                    .fetchAll()
+                    .then(items => resolve(items))
+                    .catch(err => reject(err))
+        })
     }
-    return { save, remove, getByListId}
+
+    return { save, remove, getByListId }
 }

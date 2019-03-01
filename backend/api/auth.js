@@ -3,20 +3,19 @@ const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
+    
     const signin = async (req, res) => {
         if(!req.body.email || !req.body.password) {
             return res.status(400).send('Please, type user and password.')
         }
     
-
-    const user = await app.db('users')
-        .where({ email: req.body.email })
-        .first()
-
+        const user = await app.db('users')
+                    .where({ email: req.body.email })
+                    .first()
         if(!user) return res.status(400).send('User not found.')
 
         const isMatch = bcrypt.compareSync(req.body.password, user.password)
-        if(!isMatch) return res.status(401).send('Invalid Email / Password.')
+            if(!isMatch) return res.status(401).send('Invalid Email / Password.')
 
         const now = Math.floor(Date.now() / 1000)
 
@@ -26,6 +25,8 @@ module.exports = app => {
             lastName: user.lastName,
             email: user.email,
             admin: user.admin,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
             iat: now,
             exp: now + (60 * 60 * 24)
         }

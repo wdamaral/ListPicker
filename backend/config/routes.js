@@ -35,7 +35,7 @@ module.exports = app => {
     app.route('/lists/:id')
         //.all(app.config.passport.authenticate())
         .get(app.api.list.getById)
-        .put(app.api.list.save)
+        .patch(app.api.list.edit)
         .delete(app.api.list.remove)
 
     app.route('/lists/:id/items')
