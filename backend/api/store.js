@@ -1,27 +1,47 @@
 module.exports = app => {
-    const { existsOrError, notExistsOrError, isValidID } = app.api.validation
-
+    const {
+        existsOrError,
+        notExistsOrError,
+        isValidID
+    } = app.api.validation
+    const {
+        Store,
+        List
+    } = app.models.index
     const save = (req, res) => {
-        const store = { ...req.body }
-        if(req.params.id) store.id = req.params.id
+        const store = {
+            ...req.body
+        }
+        if (req.params.id) store.id = req.params.id
 
         try {
             existsOrError(store.name, "Name cannot be blank")
             existsOrError(store.description, "Description cannot be blank")
             existsOrError(store.imageUrl, "Logo cannot be blank")
-        } catch(msg) {
+        } catch (msg) {
             return res.status(400).send(msg)
         }
 
-        if(store.id) {
-            app.db('stores')
-                .update(store)
-                .where({ id: store.id })
+        if (store.id) {
+            try {
+                isValidID(store.id, 'ID not valid.')
+
+            } catch (msg) {
+                return res.status(400).send(msg)
+            }
+            Store
+                .forge()
+                .save(store, {
+                    method: 'update'
+                })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            app.db('stores')
-                .insert(store)
+            Store
+                .forge()
+                .save(store, {
+                    method: 'insert'
+                })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         }
@@ -31,38 +51,62 @@ module.exports = app => {
         try {
             isValidID(req.params.id, "ID not valid.")
 
-            const lists = await app.db('lists')
-                .where({ storeId: req.params.id })
-                notExistsOrError(lists, 'Store ID is attached to some lists. Cannot be removed.')
-                
-            const rowsDeleted = await app.db('stores')
-                .where({ id: req.params.id }).del()
+            const lists = await List
+                .where({
+                    storeId: req.params.id
+                })
+                .fetch()
+            notExistsOrError(lists, 'Store ID is attached to some lists. Cannot be removed.')
+
+            const rowsDeleted = await Store
+                .where({
+                    id: req.params.id
+                })
+                .destroy()
             existsOrError(rowsDeleted, 'Store not found.')
-            
-            res.status(204).send()
+
+            return res.status(204).send()
         } catch (msg) {
             return res.status(400).send(msg)
         }
     }
 
     const get = (req, res) => {
-        app.db('stores')
-            .then(stores => res.json(stores))
+        const page = req.query.page || 1
+        Store
+            .query(qb => qb)
+            .fetchPage({
+                pageSize: 10,
+                page
+            })
+            .then(stores => res.json({
+                stores,
+                pagination: stores.pagination
+            }))
             .catch(err => res.status(500).send(err))
     }
 
     const getById = (req, res) => {
         try {
             isValidID(req.params.id, 'ID not valid.')
-            app.db('stores')
-                .select('id', 'name', 'description', 'imageUrl')
-                .where({ id: req.params.id }).first()
+            Store
+                .where({
+                    id: req.params.id
+                })
+                .fetch({
+                    columms: ['id', 'name', 'description', 'imageUrl']
+                })
                 .then(store => res.json(store))
                 .catch(err => res.status(500).send(err))
-        } catch(msg) {
+        } catch (msg) {
             return res.status(400).send(msg)
         }
     }
 
-    return { save, remove, get, getById }
+    return {
+        save,
+        remove,
+        get,
+        getById
+    }
 }

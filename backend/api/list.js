@@ -14,10 +14,11 @@ module.exports = app => {
     } = app.models.index
 
     const save = (req, res) => {
+        const user = req.user
         const list = {
             ...req.body
         }
-        list.ownerId = 1
+        list.ownerId = user.id
         if (req.params.id) list.id = req.params.id
         try {
             existsOrError(list.storeId, 'Store not selected.')
@@ -57,6 +58,8 @@ module.exports = app => {
     }
 
     const edit = async (req, res) => {
+        const user = req.user
+        // console.log(req.body)
         const list = {
             ...req.body
         }
@@ -75,13 +78,13 @@ module.exports = app => {
             return res.status(500).send(err)
         }
 
-        if (listFromDb.get('pickerId') === 1) {
+        if (listFromDb.get('pickerId') === user.id) {
             let items = _.map(list.listItems, item => _.pick(item, ['id', 'price']))
             let body = _.pick(req.body, ['receiptNumber'])
 
             app.bookshelf.transaction(t => {
                 return List
-                    .where('id', list.id)
+                    .where({'id': list.id, pickerId: user.id})
                     .save(body, {
                         method: 'update',
                         patch: true,
@@ -101,7 +104,7 @@ module.exports = app => {
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 
-        } else if (listFromDb.get('ownerId') === 1) {
+        } else if (listFromDb.get('ownerId') === user.id) {
             let body = _.pick(req.body, ['storeId'])
             let itemsFromBody = req.body.listItems
 
@@ -119,7 +122,7 @@ module.exports = app => {
 
             app.bookshelf.transaction(t => {
                     return List
-                        .where('id', list.id)
+                        .where({'id': list.id, 'ownerId': user.id})
                         .save(body, {
                             method: 'update',
                             patch: true,
@@ -146,13 +149,15 @@ module.exports = app => {
 
 
     const remove = async (req, res) => {
+        const user = req.user
         try {
             isValidID(req.params.id, "ID not valid.")
 
             const listPicker = await List
                 .fetch('pickerId')
                 .where({
-                    id: req.params.id
+                    id: req.params.id,
+                    ownerId: user.id
                 })
             notExistsOrError(listPicker, 'List cannot be deleted. A picker has picked it.')
 
@@ -170,52 +175,34 @@ module.exports = app => {
             return res.status(500).send(msg)
         }
     }
-
-    const limit = 10 //pagination
+    
     const get = async (req, res) => {
         const page = req.query.page || 1
 
-        const result = await app.db('lists')
-            .count('id')
-            .first()
-
-        const count = parseInt(result.count)
-
-        app.db('lists')
-            .select('id', 'totalItems', 'storeId', 'userId', 'pickerId')
-            .limit(limit).offset(page * limit - limit)
-            .then(lists => res.json({
-                data: lists,
-                count,
-                limit
-            }))
-            .catch(err => res.status(500).send(err))
+        List
+            .query(qb => qb)
+            .fetchPage({columns: ['id', 'totalItems', 'storeId', 'ownerId', 'pickerId'], pageSize: 10, page })
+            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .catch(err => {
+                console.log(err)
+                return res.status(500).send(err)})
     }
 
     const getById = (req, res) => {
-        let listItems;
+        //console.log(req)
         try {
             isValidID(req.params.id, 'ID not valid.')
-            app.db('listItems')
-                .where({
-                    id: req.params.id
+            List
+                .where('id', req.params.id)
+                .fetch({withRelated: 'listItems'})
+                .then(list => { 
+                    if(list) {
+                        return res.status(200).json(list)
+                    }
+                    return res.status(204).send()  
                 })
-                .then(listItems => listItems)
                 .catch(err => res.status(500).send(err))
-        } catch (msg) {
-            return res.status(400).send(msg)
-        }
-
-        try {
-            isValidID(req.params.id, 'ID not valid.')
-            app.db('lists')
-                .where({
-                    id: req.params.id
-                }).first()
-                //.then(list => res.json(list['listItems'].push(listItems)))
-                .then(list => res.json(list))
-                .catch(err => res.status(500).send(err))
-        } catch (msg) {
+        }catch(msg) {
             return res.status(400).send(msg)
         }
     }
