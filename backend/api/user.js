@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt-nodejs')
 
+const { geocodeAddress }  = require('./geocode/geocode')
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidID } = app.api.validation
     const { User }  = app.models.index
@@ -39,6 +40,16 @@ module.exports = app => {
             
         } catch(msg) {
             return res.status(400).send(msg)
+        }
+
+        try {
+            let coordinates = await geocodeAddress(`${user.street}, ${user.city}, ${user.province}`)
+            if(coordinates.latitude) {
+                user.latitude = coordinates.latitude
+                user.longitude = coordinates.longitude
+            }
+        } catch(err) {
+            console.log(err)
         }
 
         user.password = encryptPassword(user.password)

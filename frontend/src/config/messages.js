@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Toasted from 'vue-toasted'
 
-Vue.user(Toasted), {
+Vue.use(Toasted, {
     iconPack: 'fontawesome',
+    position: "bottom-center",
     duration: 3000
-}
+    })
 
 Vue.toasted.register(
     'defaultSuccess',
