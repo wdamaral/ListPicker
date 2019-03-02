@@ -79,9 +79,16 @@ module.exports = app => {
         }
 
         if (listFromDb.get('pickerId') === user.id) {
-            let items = _.map(list.listItems, item => _.pick(item, ['id', 'price']))
-            let body = _.pick(req.body, ['receiptNumber'])
-
+            let items = _.map(list.listItems, item => _.pick(item, ['id', 'cost']))
+            let body = _.pick(req.body, ['receiptNumber'], item.reduce((a,b) => a+b))
+            let cost;
+            try {
+                for(let item of items) {
+                    isNumber(item.cost, 'Final cost is invalid')
+                }
+            } catch (msg) {
+                return res.status(400).send(msg)
+            }
             app.bookshelf.transaction(t => {
                 return List
                     .where({'id': list.id, pickerId: user.id})
@@ -100,6 +107,7 @@ module.exports = app => {
                             })
                         )
                     })
+                    .then()
             })
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))

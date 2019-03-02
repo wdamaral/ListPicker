@@ -37,7 +37,6 @@ module.exports = app => {
             
             let listId = req.params.id
             let itemId = req.params.itemId
-            const ListItem = app.models.index.ListItem
             let rowsDeleted = new ListItem({id: itemId, listId}).destroy()
                 try {
                     notExistsOrError(rowsDeleted.message, 'List not found.')
