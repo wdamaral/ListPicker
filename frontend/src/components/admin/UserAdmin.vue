@@ -3,7 +3,7 @@
         <b-form>
             <input id="user-id" type="hidden" v-model="user.id">
             <b-row>
-                <b-col md="6" sm="12">
+                <b-col md="4" sm="12">
                     <b-form-group label="First name" label-for="user-first-name">
                         <b-form-input id="user-first-name" type="text" 
                             v-model="user.firstName" required
@@ -11,12 +11,23 @@
                             placeholder="User's first name"/>
                     </b-form-group>
                 </b-col>
-                <b-col md="6" sm="12">
+                <b-col md="4" sm="12">
                     <b-form-group label="Last name" label-for="user-last-name">
                         <b-form-input id="user-last-name" type="text" 
                             v-model="user.lastName" required
                             :readonly="mode === 'remove'"
                             placeholder="User's last name"/>
+                    </b-form-group>
+                </b-col>
+                <b-col md="3" sm="3" center>
+                    <b-img v-bind="photoProps" :src="getImageUrl" v-show="showPreview" rounded thumbnail fluid/>
+                    
+                    <b-form-group label="Photo" label-for="file-input">
+                        <b-form-file accept="image/jpeg, image/jpg image/png, image/gif" 
+                            @change="upload($event)" 
+                            id="file-input"
+                            placeholder="Choose a file..."
+                            drop-placeholder="Drop file here..."/>
                     </b-form-group>
                 </b-col>
             </b-row>
@@ -134,6 +145,8 @@ export default {
     data: function() {
         return {
             mode: 'save',
+            fileUrl: '',
+            showPreview: false,
             user: {},
             users: [],
             fields: [
@@ -142,10 +155,37 @@ export default {
                 { key: 'lastName', lable: 'Last name', sortable: true },
                 { key: 'email', label: 'E-mail', sortable: true },
                 { key: 'actions', label: 'Actions'}
-            ]
+            ],
+            photoProps: { width: 80, height: 80, class: 'm1' }
+        }
+    },
+    computed: {
+        getImageUrl: function() {
+            return this.fileUrl
         }
     },
     methods: {
+        upload(event) {
+        const url = `${baseApiUrl}/upload`
+        let data = new FormData()
+        let file = event.target.files[0]
+        
+        data.append('name', 'my-file')
+        data.append('file', file)
+
+        let config = {
+            header : {
+                'Content-Type' : 'multipart/form-data'
+            }
+        }
+
+        axios.post(url, data, config).then(
+            response => {
+                this.fileUrl = response.data.filePath
+                this.$toasted.global.defaultSuccess()
+                this.showPreview = true
+        }).catch(showError)
+    },
         loadUsers() {
             const url = `${baseApiUrl}/users`
             axios.get(url).then(res => {
@@ -160,6 +200,7 @@ export default {
         save() {
             const method = this.user.id ? 'put' : 'post'
             const id = this.user.id ? `/${this.user.id}` : ''
+            this.user.picture = this.data.fileUrl
             axios[method](`${baseApiUrl}/users/${id}`, this.user)
                 .then(() => {
                     this.$toasted.global.defaultSuccess()

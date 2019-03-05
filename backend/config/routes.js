@@ -1,6 +1,7 @@
 const admin = require('./admin')
 
 module.exports = app => {
+    
     app.post('/signup', app.api.user.save)
     app.post('/signin', app.api.auth.signin)
     app.post('/validateToken', app.api.auth.validateToken)
@@ -43,6 +44,9 @@ module.exports = app => {
         .get(app.api.listItem.getByListId)
         
     app.route('/lists/:id/items/:itemId')
-        //.all(app.config.passport.authenticate())
+        .all(app.config.passport.authenticate())
         .post(app.api.listItem.remove)
+
+    app.route('/upload')
+        .post(app.api.imageUpload.uploadPicture)
 }
