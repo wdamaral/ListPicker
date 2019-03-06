@@ -1,4 +1,6 @@
 const admin = require('./admin')
+const listOwner = require('./listOwner')
+const listPicker = require('./listPicker')
 
 module.exports = app => {
     
@@ -42,7 +44,15 @@ module.exports = app => {
     app.route('/lists/:id/items')
         //.all(app.config.passport.authenticate())
         .get(app.api.listItem.getByListId)
+
+    app.route('/lists/:id/confirm-delivery')
+        //.all(app.config.passport.authenticate())
+        .post(listOwner(app.api.list.confirmDelivery))
         
+    app.route('/lists/:id/deliver')
+        .all(app.config.passport.authenticate())
+        .post(listPicker(app.api.list.deliver))    
+
     app.route('/lists/:id/items/:itemId')
         .all(app.config.passport.authenticate())
         .post(app.api.listItem.remove)

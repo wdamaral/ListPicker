@@ -11,7 +11,7 @@ module.exports = app => {
     const {
         List,
         ListItem
-    } = app.models.index
+    } = app.models
 
     const save = (req, res) => {
         const user = req.user
@@ -154,7 +154,53 @@ module.exports = app => {
             return res.status(400).send('You are neither the owner nor the picker of this list.')
         }
     }
+    const confirmDelivery = async (req, res) => {
+        
+        // const user = req.user
+        const user = {id: 1}
 
+        try {
+            isValidID(req.params.id, "ID not valid.")
+            const list = await new List({id: req.params.id, ownerId: user.id })
+                .query(qb => {
+                    qb.havingNotNull('deliveredAt')
+                    qb.groupBy('id')
+                })
+                .fetch()
+                existsOrError(list, 'List not found or not delivered yet.')
+
+                List
+                    .forge({id: list.id, ownerId: list.ownerId})
+                    .save({ confirmedAt: new Date(Date.now()) })
+                    .then(_ => res.status(200).send())
+                    .catch(err => res.status(500).send(err))
+        } catch(msg) {
+            return res.status(400).send(msg)
+        }
+    }
+
+    const deliver = async (req, res) => {
+        
+        // const user = req.user
+        const user = {id: 2}
+
+        try {
+            isValidID(req.params.id, "ID not valid.")
+            const list = await new List({id: req.params.id, pickerId: user.id })
+                .fetch()
+                console.log(list)
+
+                existsOrError(list, 'List not found.')
+
+                List
+                    .forge({id: list.id, pickerId: list.pickerId})
+                    .save({ deliveredAt: new Date(Date.now()) })
+                    .then(_ => res.status(200).send())
+                    .catch(err => res.status(500).send(err))
+        } catch(msg) {
+            return res.status(400).send(msg)
+        }
+    }
 
     const remove = async (req, res) => {
         const user = req.user
@@ -221,6 +267,8 @@ module.exports = app => {
         edit,
         remove,
         get,
-        getById
+        getById,
+        confirmDelivery,
+        deliver
     }
 }

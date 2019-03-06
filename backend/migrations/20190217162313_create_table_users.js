@@ -14,6 +14,7 @@ exports.up = function(knex, Promise) {
       table.string('city').notNull()
       table.string('province', 2).notNull()
       table.string('postalCode', 7).notNull()
+      table.boolean('admin').notNull().defaultTo(false)
       table.timestamp('createdAt').notNull().defaultTo(knex.fn.now())
       table.timestamp('updatedAt')
       table.timestamp('deletedAt')

@@ -10,7 +10,7 @@ consign()
     .then('./api/validation.js')
     .then('./bookshelf.js')
     .then('./models')
-    .then('/api')
+    .then('./api')
     .then('./config/routes.js')
     .into(app)
 

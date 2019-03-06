@@ -1,7 +1,6 @@
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const express = require('express')
-const path = require('path')
 
 
 module.exports = app => {

@@ -1,6 +1,6 @@
 module.exports = app => {
     const { existsOrError, isValidID } = app.api.validation
-    const { ListItem } = app.models.index
+    const { ListItem } = app.models
 
     const save = (req, res) => {
         const listItems = { ...req.body }

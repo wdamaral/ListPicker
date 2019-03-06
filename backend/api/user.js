@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt-nodejs')
 const { geocodeAddress }  = require('./geocode/geocode')
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidID } = app.api.validation
-    const { User }  = app.models.index
+    const { User }  = app.models
     
     const encryptPassword = password => {
         const salt = bcrypt.genSaltSync(10)
@@ -49,7 +49,7 @@ module.exports = app => {
                 user.longitude = coordinates.longitude
             }
         } catch(err) {
-            console.log(err)
+            return res.status(500).send('Fail to connect to Google API.')
         }
 
         user.password = encryptPassword(user.password)
@@ -95,10 +95,6 @@ module.exports = app => {
         } catch(msg) {
             return res.status(400).send(msg)
         }
-    }
-
-    const getUserByToken = (token) => {
-
     }
 
     return { save, get, getById }
