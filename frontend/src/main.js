@@ -1,11 +1,12 @@
-import 'font-awesome/css/font-awesome.min.css'
+import '@babel/polyfill'
 import Vue from 'vue'
+import './plugins/vuetify'
 
 import App from './App.vue'
 
 import './config/bootstrap'
 import './config/messages'
-import store from './config/store'
+import store from './store'
 import router from './config/router'
 
 Vue.config.productionTip = false

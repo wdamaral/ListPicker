@@ -1,49 +1,26 @@
 <template>
-    <div class="home">
-        <PageTitle icon="fa fa-home" main="Dashboard"
-            sub="Base de conhecimento" />
-            
-        <div class="stats">
-            <Stat title="Lists" :value="stat.lists"
-                icon="fa fa-folder" color="#d54d50" />
-            <Stat title="Picked" :value="stat.picked"
-                icon="fa fa-folder" color="#3bc480" />
-            <Stat title="Users" :value="stat.users"
-                icon="fa fa-user" color="#3282cd" />
-            
-        </div>
+ <div>
+        <home-hero/>
+        <Middle/>
+        <Bottom/>
+        <Contact/>
+        <Footer/>
     </div>
 </template>
 
 <script>
-import PageTitle from '@/components/template/PageTitle'
-import Stat from './Stat'
-import axios from 'axios'
-import { baseApiUrl } from '@/global'
+import HomeHero from '@/components/home/HomeHero'
+import Middle from '@/components/home/Middle'
+import Bottom from '@/components/home/Bottom'
+import Contact from '@/components/home/Contact'
+import Footer from '@/components/home/Footer'
 
 export default {
     name: 'Home',
-    components: { PageTitle, Stat },
-    data: function() {
-        return {
-            stat: {}
-        }
-    },
-    methods: {
-        getStats() {
-            axios.get(`${baseApiUrl}/stats`).then(res => this.stat = res.stat)
-        }
-    },
-    mounted() {
-        this.getStats()
-    },
+    components: { HomeHero, Middle, Bottom, Contact, Footer },
+    
 }
 </script>
 
 <style>
-    .stats {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
 </style>

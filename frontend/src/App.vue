@@ -1,52 +1,20 @@
 <template>
-  <div id="app" :class="{'hide-menu' : !isMenuVisible}">
-    <Header title="Grocery List Picker" 
-      :hideToggle="false"
-      :hideUserDropdown="false"/>
-    <Menu />
-    <Content />
-    <Footer />
-  </div>
+  <v-app>
+    <app-navigation/>
+        <v-content transition="slide-x-transition">
+            <router-view></router-view>
+        </v-content>
+    </v-app>
 </template>
 
 <script>
+import AppNavigation from '@/components/template/AppNavigation';
+
 import { mapState } from 'vuex'
-import Header from "@/components/template/Header"
-import Menu from "@/components/template/Menu"
-import Content from "@/components/template/Content"
-import Footer from "@/components/template/Footer"
 export default {
   name: 'App',
-  components: {Header, Menu, Content, Footer},
-  computed: mapState(['isMenuVisible'])
+  components: { AppNavigation }
 }
 </script>
 <style>
-  * {
-    font-family: "Lato", sans-serif;
-  }
-  body {
-    margin: 0;
-  }
-  #app {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
-    height: 100vh;
-    display: grid;
-    grid-template-rows: 60px 1fr 40px;
-    grid-template-columns: 300px 1fr;
-    grid-template-areas: 
-      "header header"
-      "menu content"
-      "menu footer";
-
-  }
-
-  #app.hide-menu {
-    grid-template-areas: 
-      "header header"
-      "content content"
-      "footer footer";
-  }
 </style>

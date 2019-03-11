@@ -1,7 +1,7 @@
 <template>
     <div class="admin-pages">
-        <PageTitle icon="fa fa-cogs" main="System admin"
-            sub="Registration" />
+        <PageTitle icon="fa fa-cogs" main="dashboard"
+            sub="Dashboard" />
         <div class="admin-pages-tabs">
             <b-card no-body>
                 <b-tabs card>
@@ -18,17 +18,19 @@
 </template>
 
 <script>
-import PageTitle from '@/components/template/PageTitle'
 import StoreAdmin from "./StoreAdmin"
 import UserAdmin from "./UserAdmin"
 
 export default {
-    name: 'AdminPages',
-    components: { PageTitle, StoreAdmin, UserAdmin }
+    name: 'Dashboard',
+    components: { StoreAdmin, UserAdmin }
 
 }
 </script>
 
 <style>
-
+    .admin-pages {
+        margin-left: 50px;
+        margin-right: 50px;
+    }
 </style>
