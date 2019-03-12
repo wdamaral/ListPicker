@@ -9,6 +9,7 @@
             <v-container>
             <v-layout row>
             <v-flex xs-12>
+                
             <v-text-field
                 v-model="user.data.firstName"
                 :counter="50"
@@ -49,8 +50,15 @@
             ></v-text-field>
             </v-flex>
             </v-layout>
+            <v-layout row>
+            <v-flex xs-12>
+            <v-icon small class="red--text">lock</v-icon> 
+            <span class="caption red--text">Don't worry, we won't share any information.</span>
+            </v-flex>
+            </v-layout>
             </v-container>
 </v-form>
+<v-divider></v-divider>
 <v-card-actions>
 <v-btn
             :disabled="!valid"

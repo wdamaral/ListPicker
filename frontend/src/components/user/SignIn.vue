@@ -11,7 +11,7 @@
                     </v-stepper-step>
                     <v-divider></v-divider>
                     <v-stepper-step :complete="user.step > 3" step="3">
-                        Your information
+                        E-mail and password
                     </v-stepper-step>
                     <v-divider></v-divider>
                 </v-stepper-header>
@@ -29,20 +29,6 @@
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
-    <v-snackbar
-        v-model="user.snackbar"
-        bottom
-        :timeout="user.timeout"
-      >
-        {{ user.text }}
-        <v-btn
-          color="pink"
-          flat
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </v-snackbar>
     </v-container>
     
 </template>

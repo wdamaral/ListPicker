@@ -8,10 +8,7 @@ export default {
         step: 0,
         mode: 'save',
         fileUrl: '',
-        showPreview: false,
-        snackbar: false,
-        snackText: null,
-        timeout: 3000
+        showPreview: false
     },
     mutations: {
         nextStep(state) {
@@ -19,6 +16,10 @@ export default {
         },
         resetStep(state) {
             state.step = 1
+        },
+        resetAll(state) {
+            state.data = {}
+            state.step = 0
         }
     },
     getters: {
@@ -27,19 +28,24 @@ export default {
         }
     },
     actions: {
-        save(context) {
-            const method = context.state.data.id ? 'put' : 'post'
-            const id = context.state.data.id ? `/${context.state.data.id}` : ''
-            axios[method](`${baseApiUrl}/users/${id}`, context.state.data)
+        save({commit, state}, router ) {
+            const method = state.data.id ? 'put' : 'post'
+            const id = state.data.id ? `/${state.data.id}` : ''
+            axios[method](`${baseApiUrl}/users/${id}`, state.data)
             .then(() => {
-                context.state.snackbar = true
-                context.state.text = 'Success! User registered.'
-                context.state.date = {}
+                commit('activeSnackbar', 'Success! User registered.', { root: true })
+                commit('resetAll')
+                router.push('/')
             })
             .catch(err => {
-                let error = err.response.data
-                context.state.text = error
-                context.state.snackbar = true
+                let error
+                if(err.response.data) {
+                    error = err.response.data
+                } else {
+                    error = err
+                }
+                
+                commit('activeSnackbar', error, { root: true })
             })
         }
     }
