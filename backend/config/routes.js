@@ -51,7 +51,19 @@ module.exports = app => {
         
     app.route('/lists/:id/deliver')
         .all(app.config.passport.authenticate())
-        .post(listPicker(app.api.list.deliver))    
+        .post(listPicker(app.api.list.deliver))
+
+    app.route('/lists/history/closed')
+        .all(app.config.passport.authenticate())
+        .post(listPicker(app.api.list.getOldByUserId))
+
+    app.route('/lists/history/own')
+        .all(app.config.passport.authenticate())
+        .post(listPicker(app.api.list.getOwnedByUserId))
+
+    app.route('/lists/history/pick')
+        .all(app.config.passport.authenticate())
+        .post(listPicker(app.api.list.getOwnedByUserId))
 
     app.route('/lists/:id/items/:itemId')
         .all(app.config.passport.authenticate())
