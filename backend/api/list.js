@@ -11,7 +11,7 @@ module.exports = app => {
     const {
         List,
         ListItem
-    } = app.models
+    } = app.models.index
 
     const save = (req, res) => {
         const user = req.user
