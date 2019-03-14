@@ -11,7 +11,7 @@ module.exports = app => {
     const {
         List,
         ListItem
-    } = app.models
+    } = app.models.index
 
     const save = (req, res) => {
         const user = req.user
@@ -237,9 +237,7 @@ module.exports = app => {
             .query(qb => qb)
             .fetchPage({columns: ['id', 'totalItems', 'storeId', 'ownerId', 'pickerId'], pageSize: 10, page })
             .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
-            .catch(err => {
-                console.log(err)
-                return res.status(500).send(err)})
+            .catch(err => res.status(500).send(err))
     }
 
     const getById = (req, res) => {
@@ -261,6 +259,45 @@ module.exports = app => {
         }
     }
 
+    const getHistoryByUserId = (req, res) => {
+        const page = req.query.page || 1
+        const user = req.user
+        List
+            .query(qb => {
+                qb.where({ownerId: user.id})
+                qb.orWhere({pickerId: user.id})
+                qb.havingNotNull('confirmedAt')
+                qb.groupBy('id')
+            })
+            .fetchPage({ pageSize: 10, page })
+            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const getPickedByUserId = (req, res) => {
+        const page = req.query.page || 1
+        const user = req.user
+        List
+            .query(qb => {
+                qb.where({pickerId: user.id})
+            })
+            .fetchPage({ pageSize: 10, page })
+            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const getOwnedByUserId = (req, res) => {
+        const page = req.query.page || 1
+        const user = req.user
+        List
+            .query(qb => {
+                qb.where({ownerId: user.id})
+            })
+            .fetchPage({ pageSize: 10, page })
+            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .catch(err => res.status(500).send(err))
+    }
+
 
     return {
         save,
@@ -269,6 +306,9 @@ module.exports = app => {
         get,
         getById,
         confirmDelivery,
-        deliver
+        deliver,
+        getHistoryByUserId,
+        getPickedByUserId,
+        getOwnedByUserId
     }
 }

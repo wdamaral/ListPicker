@@ -3,7 +3,8 @@ const bcrypt = require('bcrypt-nodejs')
 const { geocodeAddress }  = require('./geocode/geocode')
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidID } = app.api.validation
-    const { User }  = app.models
+    const { User }  = app.models.index
+    const { moveFile } = app.api.imageUpload
     
     const encryptPassword = password => {
         const salt = bcrypt.genSaltSync(10)
@@ -65,11 +66,16 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            User
-                .forge(user)
-                .save()
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
+            app.bookshelf.transaction(t => {
+                let pic = user.profilePicture
+                let saveUser = new User(user).save(null, {transacting: t})
+                let movePic = moveFile(pic, 'users')
+                return Promise.all([saveUser, movePic])
+                        
+            })
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
+            
         }
     }
 
@@ -78,7 +84,7 @@ module.exports = app => {
             User
                 .query(qb => qb)
                 .orderBy('firstName')
-                .fetchPage({columns: ['id', 'email', 'firstName', 'lastName'], pageSize: 10, page })
+                .fetchPage({columns: ['id', 'email', 'firstName', 'createdAt'], pageSize: 10, page })
                 .then(users => res.status(200).json({users: users, pagination: users.pagination}))
                 .catch(err => res.status(500).send(err))
     }
@@ -88,10 +94,11 @@ module.exports = app => {
             isValidID(req.params.id, 'ID not valid.')
             User
                 .where('id', req.params.id)
-                .fetch({columns: ['id', 'firstName', 'lastName', 'phoneNumber', 'street', 
-                'unit', 'city', 'province', 'postalCode', 'email', 'admin', 'createdAt', 'updatedAt']})
+                .fetch({withRelated: ['lists', 'listsPick'], 
+                        columns: ['id', 'firstName', 'city', 'province', 'admin', 'createdAt', 'latitude', 'longitude']})
                 .then(user => res.status(200).json(user))
-                .catch(err => res.status(500).send(err))
+                .catch(err => { console.log(err)
+                    res.status(500).send(err)})
 
         } catch(msg) {
             return res.status(400).send(msg)
