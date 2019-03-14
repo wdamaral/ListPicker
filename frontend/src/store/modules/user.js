@@ -14,17 +14,27 @@ export default {
         nextStep(state) {
             state.step++
         },
+        stepBack(state) {
+            state.step--
+        },
         resetStep(state) {
             state.step = 1
         },
         resetAll(state) {
             state.data = {}
             state.step = 0
+        },
+        fileName(state, payload) {
+            state.fileUrl = payload.fileUrl
+            state.showPreview = payload.showPreview
         }
     },
     getters: {
         stepNumber(state) {
             return state.step
+        },
+        getImageUrl(state) {
+            return state.fileUrl
         }
     },
     actions: {
@@ -38,6 +48,38 @@ export default {
                 router.push('/')
             })
             .catch(err => {
+                let error
+                if(err.response.data) {
+                    error = err.response.data
+                } else {
+                    error = err
+                }
+                
+                commit('activeSnackbar', error, { root: true })
+            })
+        },
+        upload({commit}, event) {
+            const url = `${baseApiUrl}/upload`
+            let data = new FormData()
+            let file = event.target.files[0] 
+            if(!file) {
+                return commit('activeSnacbar', 'No files selected', { root: true })
+            }
+            
+            data.append('name', 'my-file')
+            data.append('file', file)
+    
+            let config = {
+                header : {
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }
+    
+            axios.post(url, data, config).then(
+                response => {
+                    commit('fileName', { fileUrl: response.data.filePath, showPreview: true })
+                    commit('activeSnackbar', 'Picture uploaded.', {root: true})
+            }).catch(err => {
                 let error
                 if(err.response.data) {
                     error = err.response.data

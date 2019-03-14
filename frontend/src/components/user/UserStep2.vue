@@ -65,14 +65,30 @@
 </v-form>
 <v-divider></v-divider>
 <v-card-actions>
-<v-btn
+<v-container fluid>
+    <v-layout row >
+        <v-flex xs-6>
+    <p class="text-xs-left">
+    <v-btn
+            icon
+            flat
+            @click="stepBack"
+        >
+        <v-icon>arrow_back_ios</v-icon>
+    </v-btn>
+    </p>
+        </v-flex>
+        <v-flex xs-6>
+    <p class="text-xs-right">
+    <v-btn 
             :disabled="!valid"
             color="success"
             @click="validate"
-        >Continue</v-btn>
-          <v-btn flat
-            @click="reset"
-          >Cancel</v-btn>
+        >Next</v-btn>
+    </p>
+        </v-flex>
+    </v-layout>
+</v-container>
 </v-card-actions>
           </v-card>
 </template>
@@ -109,6 +125,9 @@ export default {
     methods: {
         nextStep() {
             this.$store.commit('nextStep')
+        },
+        stepBack() {
+            this.$store.commit('stepBack')
         },
         validate () {
             if (this.$refs.form.validate()) {

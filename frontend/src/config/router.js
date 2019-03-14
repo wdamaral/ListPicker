@@ -4,7 +4,7 @@ import VueRouter from 'vue-router'
 import Home from '@/components/home/Home'
 import Admin from '@/components/admin/Admin'
 import Dashboard from '@/components/admin/Dashboard'
-import StoreAdmin from '@/components/admin/StoreAdmin'
+import StoreAdmin from '@/components/admin/store/StoreAdmin'
 import SignIn from '@/components/user/SignIn'
 
 Vue.use(VueRouter)
@@ -15,12 +15,11 @@ const routes = [{
     component: Home
 },
 {
-    name: 'admin',
     path: '/admin',
     component: Admin,
     children: [
-        {path: '', component: Dashboard},
-        {path: 'stores', component: StoreAdmin},
+        {name: 'admin', path: '', component: Dashboard},
+        {name: 'stores', path: 'stores', component: StoreAdmin},
     ]
 },
 {   name: 'signin',

@@ -60,16 +60,20 @@
 </v-form>
 <v-divider></v-divider>
 <v-card-actions>
-<v-btn
-            :disabled="!valid"
-            color="success"
-            @click="validate"
-        >Continue</v-btn>
-  
-          <v-btn flat
-          
-            @click="reset"
-          >Cancel</v-btn>
+    <v-container fluid>
+    <v-layout row >
+    
+    <v-flex xs-12>
+        <p class="text-xs-right">
+            <v-btn 
+                :disabled="!valid"
+                color="success"
+                @click="validate"
+            >Next</v-btn>
+        </p>
+        </v-flex>
+    </v-layout>
+</v-container>
 </v-card-actions>
           </v-card>
 </template>
