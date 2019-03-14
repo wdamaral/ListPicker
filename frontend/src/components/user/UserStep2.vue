@@ -97,10 +97,11 @@
 import { mapState } from 'vuex'
 export default {
     name: 'UserStep1',
-    computed: 
-        mapState({
+    computed: {
+        ...mapState({
             user: state => state.user
-        }),
+        })
+    },
     data() {
         return {
             valid: false,
@@ -124,20 +125,20 @@ export default {
     },
     methods: {
         nextStep() {
-            this.$store.commit('nextStep')
+            this.$store.commit('user/nextStep')
         },
         stepBack() {
-            this.$store.commit('stepBack')
+            this.$store.commit('user/stepBack')
         },
         validate () {
             if (this.$refs.form.validate()) {
-                this.$store.commit('nextStep')
+                this.$store.commit('user/nextStep')
             }
         },
         reset () {
             this.$refs.form.reset()
             this.$refs.form.resetValidation()
-            this.$store.commit('resetStep')
+            this.$store.commit('user/resetStep')
         }
     }, 
     

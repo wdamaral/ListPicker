@@ -4,19 +4,19 @@
         <v-content transition="slide-x-transition">
             <router-view></router-view>
         </v-content>
-            <v-snackbar
-        v-model="appState.snackbar"
-        bottom
-        :timeout="appState.timeout"
-      >
-        {{ appState.snackText }}
-        <v-btn
-          color="pink"
-          flat
-          @click="appState.snackbar = false"
+        <v-snackbar
+          v-model="appState.snackbar"
+          bottom
+          :timeout="appState.timeout"
         >
-          Close
-        </v-btn>
+          {{ appState.snackText }}
+          <v-btn
+            color="pink"
+            flat
+            @click="appState.snackbar = false"
+          >
+            Close
+          </v-btn>
       </v-snackbar>
     </v-app>
 </template>

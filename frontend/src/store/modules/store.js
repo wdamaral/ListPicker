@@ -6,25 +6,17 @@ export default {
     namespaced: true,
     state: {
         data: {},
-        users: [],
-        step: 0,
+        stores: [],
         mode: 'save',
         fileUrl: '',
         showPreview: false
     },
     mutations: {
-        nextStep(state) {
-            state.step++
-        },
-        stepBack(state) {
-            state.step--
-        },
-        resetStep(state) {
-            state.step = 1
+        setStore(state, payload) {
+            state.stores = payload
         },
         resetAll(state) {
             state.data = {}
-            state.step = 0
             state.fileUrl = ''
             state.showPreview = false
         },
@@ -32,35 +24,28 @@ export default {
             state.fileUrl = payload.fileUrl
             state.showPreview = payload.showPreview
         },
-        userProfilePicture(state) {
-            state.data.profilePicture = state.fileUrl
-        },
-        SET_USER(state, payload) {
-            state.data = payload
-        },
-        SET_USERS(state, payload) {
-            state.users = payload
+        storeLogoPicture(state) {
+            state.data.imageUrl = state.fileUrl
         }
-
     },
     getters: {
-        step(state) {
-            return state.step
-        },
-        imageUrl(state) {
+        getImageUrl(state) {
             return state.fileUrl
+        },
+        getStores(state) {
+            return state.stores
         }
     },
     actions: {
-        save({commit, state}, router ) {
+        save({commit, state}) {
             const method = state.data.id ? 'put' : 'post'
             const id = state.data.id ? `/${state.data.id}` : ''
-            commit('userProfilePicture')
-            axios[method](`${baseApiUrl}/users/${id}`, state.data)
+            commit('storeLogoPicture')
+            axios[method](`${baseApiUrl}/stores/${id}`, state.data)
             .then(() => {
-                commit('activeSnackbar', 'Success! User registered.', { root: true })
+                commit('activeSnackbar', 'Success! Store created.', { root: true })
                 commit('resetAll')
-                router.push('/')
+                //router.push('/')
             })
             .catch(err => {
                 let error
@@ -105,13 +90,13 @@ export default {
                 commit('activeSnackbar', error, { root: true })
             })
         },
-        getUser({commit}, id) {
-            const url = `${baseApiUrl}/users/${id}`
+        loadStores({commit}) {
+            const url = `${baseApiUrl}/stores`
+
             axios
                 .get(url)
-                .then(user => {
-                    commit('SET_USER', user.data)
-                })
+                .then(stores =>
+                        commit('setStore', stores.data))
                 .catch(err => {
                     let error
                     if(err.response.data) {
@@ -119,9 +104,9 @@ export default {
                     } else {
                         error = err
                     }
+                
                     commit('activeSnackbar', error, { root: true })
                 })
         }
-
     }
 }

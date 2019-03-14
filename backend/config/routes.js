@@ -22,7 +22,6 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .get(admin(app.api.store.get))
         .post(admin(app.api.store.save))
-        .post(admin(app.api.store.save))
 
     app.route('/stores/:id')
         .all(app.config.passport.authenticate())

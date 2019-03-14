@@ -7,7 +7,7 @@ module.exports = app => {
     const {
         Store,
         List
-    } = app.models
+    } = app.models.index
     const save = (req, res) => {
         const store = {
             ...req.body

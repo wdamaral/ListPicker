@@ -1,7 +1,7 @@
 const {
   seApi
 } = require('../.env')
-
+const fs = require('fs')
 //const sightengine = require('sightengine')(seApi.apiUser, seApi.apiSecret)
 const multer = require('multer')
 const crypto = require('crypto')
@@ -11,9 +11,7 @@ const path = require('path')
 module.exports = app => {
 
   const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(undefined, './uploads')
-    },
+    destination: './temp',
     filename: function (req, file, cb) {
       crypto.pseudoRandomBytes(16, function (err, raw) {
         if (err) return cb(err);
@@ -46,11 +44,25 @@ module.exports = app => {
         } else if(err) {
           return res.status(500).send(err.message)
         }
-        // console.log(req)
-        const host = req.hostname + ':3000'
-        const filePath = req.protocol + "://" + host + '/' + 'uploads/' + req.file.filename
+        const filePath = req.file.filename
         return res.status(200).json({ filePath })
       })
+    }
+  
+  const moveFile = (fileName, newFolder) => {
+    return new Promise((resolve, reject) => {
+      var oldPath = './temp/' + fileName
+      var newPath = `./uploads/${newFolder}/${fileName}`
+
+      fs.rename(oldPath, newPath, function (err) {
+        if (err) {
+          // console.log(err)
+          reject('Oops... Something went wrong.')
+        }
+        resolve()
+      })
+    })
+  }
 
       // sightengine.check(['nudity'])
       //   .set_url(path.join(req.file.path))
@@ -66,8 +78,5 @@ module.exports = app => {
       //   return res.status(500).send(err)
       // })
       //res.send()
-    }
-    
-
-  return { uploadPicture }
+      return { uploadPicture, moveFile }
 }

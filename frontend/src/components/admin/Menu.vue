@@ -4,15 +4,27 @@
       light
       clipped
       right
+      :mini-variant.sync="mini"
       app
+      width="200"
     >
       <v-list>
+        <v-list-tile>
+            <v-list-tile-action>
+              <v-btn
+                icon
+                @click.stop="mini = !mini"
+              >
+                <v-icon v-if="mini">chevron_left</v-icon>
+                <v-icon v-if="!mini">chevron_right</v-icon>
+              </v-btn>
+            </v-list-tile-action>
+          </v-list-tile>
         <v-list-tile
           v-for="item in items"
           :key="item.title"
           router
           :to="item.link"
-          class="custom"
         >
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -31,10 +43,11 @@ export default {
     name: 'Menu',
     data () {
     return {
+      mini: true,
       items: [
         { title: 'Dashboard', icon: 'dashboard', link: 'admin/' },
         { title: 'Account', icon: 'account_box', link: '/admin/stores' },
-        { title: 'Admin', icon: 'gavel', link: 'admin/dashboard' }
+        { title: 'Admin', icon: 'gavel', link: '/admin/dashboard' }
       ]
       }
     }
@@ -42,7 +55,4 @@ export default {
 </script>
 
 <style>
-.custom {
-    text-decoration: none;
-}
 </style>

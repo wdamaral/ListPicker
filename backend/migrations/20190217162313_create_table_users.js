@@ -9,6 +9,7 @@ exports.up = function(knex, Promise) {
       table.double('latitude').notNull()
       table.double('longitude').notNull()
       table.string('phoneNumber', 10).notNull()
+      table.string('profilePicture')
       table.string('street').notNull()
       table.string('unit', 10)
       table.string('city').notNull()

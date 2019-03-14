@@ -44,7 +44,7 @@
                     size="80"
                     color="grey lighten-4"
                 >
-                    <img v-if="getImageUrl !==''" :src="getImageUrl" alt="avatar">
+                    <img v-if="getImageUrl !==''" :src="`${getPath}${getImageUrl}`" alt="avatar">
                     <img v-if="getImageUrl ===''" :src="require('../../assets/avatar_profile.png')" alt="avatar">
                 </v-avatar>
                 </p>
@@ -106,6 +106,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { baseApiUrl } from '@/global'
 export default {
     name: 'UserStep3',
     computed: {
@@ -113,7 +114,10 @@ export default {
             user: state => state.user
         }),
         getImageUrl: function() {
-            return this.$store.getters.getImageUrl
+            return this.$store.getters['user/imageUrl']
+        },
+        getPath() {
+            return baseApiUrl + '/temp/'
         }
         },
     data() {
@@ -133,29 +137,29 @@ export default {
     },
     methods: {
         save () {
-            this.$store.dispatch('save', this.$router)
+            this.$store.dispatch('user/save', this.$router)
         },
         stepBack() {
-            this.$store.commit('stepBack')
+            this.$store.commit('user/stepBack')
         },
         pickFile () {
             this.$refs.image.click ()
         },
         nextStep () {
-            this.$store.commit('nextStep')
+            this.$store.commit('user/nextStep')
         },
         validate () {
             if (this.$refs.form.validate()) {
-                this.$store.commit('nextStep')
+                this.$store.commit('user/nextStep')
             }
         },
         reset () {
             this.$refs.form.reset()
             this.$refs.form.resetValidation()
-            this.$store.commit('resetStep')
+            this.$store.commit('user/resetStep')
         },
         upload(event) {
-            this.$store.dispatch('upload', event)
+            this.$store.dispatch('user/upload', event)
         }
         
     }
