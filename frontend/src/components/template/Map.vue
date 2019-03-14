@@ -1,15 +1,15 @@
 <template>
-    <div class="map">
+    <v-card elevation-3>
         <GmapMap 
             ref="mapRef"
             v-bind:center="{lat: user.data.latitude, lng: user.data.longitude}" 
-            style="max-width: 600px; height: 300px;" 
+            style="max-width: 100%; height: 300px;" 
             :zoom="16"
             :radius="10" 
             :options="mapOptions">
             <gmap-circle :radius="120" :options="mapCenterOptions" v-bind:center="{lat: user.data.latitude, lng: user.data.longitude}"/>
         </GmapMap>
-    </div>
+    </v-card>
 </template>
 
 <script>
@@ -44,5 +44,4 @@ export default {
 </script>
 
 <style>
-
 </style>

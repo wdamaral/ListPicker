@@ -94,14 +94,13 @@ module.exports = app => {
             isValidID(req.params.id, 'ID not valid.')
             User
                 .where('id', req.params.id)
-                .fetch({withRelated: 'lists', 
+                .fetch({withRelated: ['lists', 'listsPick'], 
                         columns: ['id', 'firstName', 'city', 'province', 'admin', 'createdAt', 'latitude', 'longitude']})
                 .then(user => res.status(200).json(user))
                 .catch(err => { console.log(err)
                     res.status(500).send(err)})
 
         } catch(msg) {
-            console.log(msg)
             return res.status(400).send(msg)
         }
     }

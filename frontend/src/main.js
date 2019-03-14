@@ -17,7 +17,6 @@ Vue.use(VueGoogleMaps, {
   autobindAllEvents: false,
   installComponents: true
 })
-Vue.use(require('vue-moment'))
 
 Vue.config.productionTip = false
 
