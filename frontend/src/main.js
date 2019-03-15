@@ -5,14 +5,12 @@ import * as VueGoogleMaps from 'vue2-google-maps'
 
 import App from './App.vue'
 
-import './config/bootstrap'
-import './config/messages'
 import store from './store'
 import router from './config/router'
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyB-V4zSeEhvkSC1QXGvkFNAc3dKJEsjvF8'
+    key: process.env.VUE_APP_MAPS_KEY
   },
   autobindAllEvents: false,
   installComponents: true

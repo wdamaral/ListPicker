@@ -95,7 +95,8 @@ module.exports = app => {
             User
                 .where('id', req.params.id)
                 .fetch({withRelated: ['lists', 'listsPick'], 
-                        columns: ['id', 'firstName', 'city', 'province', 'admin', 'createdAt', 'latitude', 'longitude']})
+                        columns: ['id', 'firstName', 'city', 'province', 'admin', 
+                                'createdAt', 'latitude', 'longitude', 'profilePicture']})
                 .then(user => res.status(200).json(user))
                 .catch(err => { console.log(err)
                     res.status(500).send(err)})

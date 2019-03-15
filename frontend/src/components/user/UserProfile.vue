@@ -3,21 +3,23 @@
         
         <v-container>
             <v-layout row justify-space-between wrap pa-3>
-                <v-flex xs12 md8 offset-md2>
+                <v-flex xs12 md10 offset-md1>
                     <v-card class="card--flex-toolbar">
-            <v-toolbar card prominent class="green lighten-4">
+            <v-toolbar card prominent class="green lighten-4 elevation-1">
                 <v-avatar
                     size="100"
                     color="grey lighten-4"
+                    class="elevation-4"
                 >
-                    <img :src="require('../../assets/avatar_profile.png')" alt="avatar">
+                    <img v-if="!user.data.profilePicture" :src="require('../../assets/avatar_profile.png')" alt="avatar">
+                    <img v-if="user.data.profilePicture" :src="`${imgSrc}${user.data.profilePicture}`" alt="avatar">
                 </v-avatar>
-                <p class="display-1 pl-4">Hi, I'm {{user.data.firstName}}</p>
+                <p class="headline pl-4">Hi, I'm {{user.data.firstName}}</p>
                 <v-spacer/>
-                <p class="body-2 font-weight-light">Joined in {{user.data.createdAt | moment}}</p>
             </v-toolbar>
 
             <v-card-text>
+                <div class="body-2 text-xs-right font-weight-light">Joined in {{user.data.createdAt | moment}}</div>
                 <v-container fluid>
                     
                 <p class="pt-4"><v-icon large>format_quote</v-icon></p>
@@ -50,6 +52,7 @@
 </template>
 
 <script>
+import { baseApiUrl } from '@/global'
 import Map from '@/components/template/Map'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
@@ -57,6 +60,11 @@ import moment from 'moment'
 export default {
     name: 'UserProfile',
     components: { Map },
+    data() {
+        return {
+            imgSrc: `${baseApiUrl}/uploads/users/`
+        }
+    },
     computed: {
        ...mapState({user: state => state.user}),
        ...mapGetters('user',[
@@ -64,7 +72,7 @@ export default {
            'lastListPicked',
            'lastDeliveryConfirmed',
            'activeLists'
-       ])
+        ]),
     },
     filters: {
         moment: date => {
@@ -75,6 +83,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('user/getUser', this.$route.params.id)
+        
     }, 
 }
 </script>
