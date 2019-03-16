@@ -106,5 +106,5 @@ module.exports = app => {
         }
     }
 
-    return { save, get, getById }
+    return { save, get, getById, encryptPassword }
 }
