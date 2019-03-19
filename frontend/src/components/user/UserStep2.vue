@@ -96,7 +96,7 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-    name: 'UserStep1',
+    name: 'UserStep2',
     computed: {
         ...mapState({
             user: state => state.user

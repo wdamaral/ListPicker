@@ -19,6 +19,11 @@ module.exports = app => {
         if(valueA !== valueB) throw msg
     }
 
+    function isValidPassword(value, msg) {
+        let rgx = new RegExp("([a-zA-Z0-9]{8,})$")
+        if(!rgx.test(value)) throw msg
+    }
+
     function isValidID(value, msg) {
         let rgx = new RegExp("^[1-9][0-9]*")
         if(!rgx.test(value)) throw msg
@@ -33,6 +38,7 @@ module.exports = app => {
         notExistsOrError, 
         equalsOrError, 
         isValidID,
-        isNumber 
+        isNumber,
+        isValidPassword
     }
 }

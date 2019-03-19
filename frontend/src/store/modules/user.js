@@ -40,7 +40,14 @@ export default {
         },
         SET_USERS(state, payload) {
             state.users = payload
+        },
+        SET_PASSWORD(state, payload) {
+            state.data.password = payload
+        },
+        SET_CONFIRMPASSWORD(state, payload) {
+            state.data.confirmPassword = payload
         }
+
 
     },
     getters: {
@@ -74,27 +81,70 @@ export default {
 
     },
     actions: {
-        save({commit, state}, router ) {
-            const method = state.data.id ? 'put' : 'post'
-            const id = state.data.id ? `/${state.data.id}` : ''
-            commit('userProfilePicture')
-            axios[method](`${baseApiUrl}/users/${id}`, state.data)
+        insert({commit, state}, router ) {
+            const user = {...state.data}
+
+            const method = user.id ? 'put' : 'post'
+            const id = user.id ? `${user.id}` : ''
+            if(state.fileUrl !== user.profilePicture) {
+                commit('userProfilePicture')
+                user.profilePicture = state.fileUrl
+            } else {
+                delete user.profilePicture
+            }
+            
+            axios[method](`${baseApiUrl}/users/${id}`, user)
             .then(() => {
-                commit('activeSnackbar', 'Success! User registered.', { root: true })
+                commit('activeSnackbar', 'Success! User created.', { root: true })
                 commit('resetAll')
-                router.push('/')
+                router.go('/login')
             })
             .catch(err => {
                 let error
-                if(err.response.data) {
-                    error = err.response.data
+                if(err.response) {
+                    if(err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err.response
+                    }
                 } else {
                     error = err
                 }
-                
                 commit('activeSnackbar', error, { root: true })
             })
         },
+        update({commit, state}, router) {
+            const user = {...state.data}
+
+            const method = user.id ? 'put' : 'post'
+            const id = user.id ? `${user.id}` : ''
+            if(state.fileUrl !== '') {
+                commit('userProfilePicture')
+                user.profilePicture = state.fileUrl
+            }
+            delete user.lists
+            delete user.listsPick
+            
+            axios[method](`${baseApiUrl}/users/${id}`, user)
+            .then(() => {
+                commit('activeSnackbar', 'Success! User saved.', { root: true })
+                router.go()
+            })
+            .catch(err => {
+                let error
+                if(err.response) {
+                    if(err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err.response
+                    }
+                } else {
+                    error = err
+                }
+                commit('activeSnackbar', error, { root: true })
+            })
+        },
+
         upload({commit}, event) {
             const url = `${baseApiUrl}/upload`
             let data = new FormData()
@@ -116,10 +166,15 @@ export default {
                 response => {
                     commit('fileName', { fileUrl: response.data.filePath, showPreview: true })
                     commit('activeSnackbar', 'Picture uploaded.', {root: true})
-            }).catch(err => {
+            })
+            .catch(err => {
                 let error
-                if(err.response.data) {
-                    error = err.response.data
+                if(err.response) {
+                    if(err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err.response
+                    }
                 } else {
                     error = err
                 }
@@ -136,8 +191,12 @@ export default {
                 })
                 .catch(err => {
                     let error
-                    if(err.response.data) {
-                        error = err.response.data
+                    if(err.response) {
+                        if(err.response.data) {
+                            error = err.response.data
+                        } else {
+                            error = err.response
+                        }
                     } else {
                         error = err
                     }

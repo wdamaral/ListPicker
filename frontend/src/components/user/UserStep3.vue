@@ -113,13 +113,14 @@ export default {
         ...mapState({
             user: state => state.user
         }),
-        getImageUrl: function() {
-            return this.$store.getters['user/imageUrl']
-        },
         getPath() {
             return baseApiUrl + '/temp/'
-        }
         },
+        
+        getImageUrl: function () {
+            return this.$store.getters['user/imageUrl']
+        },
+    },
     data() {
         return {
             imageName: '',
@@ -137,7 +138,7 @@ export default {
     },
     methods: {
         save () {
-            this.$store.dispatch('user/save', this.$router)
+            this.$store.dispatch('user/insert', this.$router)
         },
         stepBack() {
             this.$store.commit('user/stepBack')

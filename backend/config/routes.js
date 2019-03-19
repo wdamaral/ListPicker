@@ -4,7 +4,7 @@ const listPicker = require('./listPicker')
 
 module.exports = app => {
     
-    app.post('/signup', app.api.user.save)
+    app.post('/signup', app.api.user.insert)
     app.post('/signin', app.api.auth.signin)
     app.post('/validateToken', app.api.auth.validateToken)
     app.post('/forgot-password', app.api.auth.forgotPassword)
@@ -12,12 +12,12 @@ module.exports = app => {
 
     app.route('/users')
         //.all(app.config.passport.authenticate())
-        .post(app.api.user.save)
+        .post(app.api.user.insert)
         // .get(admin(app.api.user.get))
         .get(app.api.user.get)
     app.route('/users/:id')
-        //.all(app.config.passport.authenticate())
-        .put(app.api.user.save)
+        .all(app.config.passport.authenticate())
+        .put(app.api.user.update)
         .get(app.api.user.getById)
 
     app.route('/stores')

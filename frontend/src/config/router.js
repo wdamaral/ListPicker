@@ -29,13 +29,13 @@ const routes = [{
         component: SignIn
     },
     {   name: 'userEdit',
-        path: '/user/:id/edit',
+        path: '/users/:id/edit',
         component: EditUser
     },
     {   name: 'userProfile',
-        path: '/user/:id',
+        path: '/users/:id',
         component: UserProfile
-    }
+    },
 ]
 
 const router = new VueRouter({
