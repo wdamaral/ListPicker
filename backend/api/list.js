@@ -10,7 +10,8 @@ module.exports = app => {
     } = app.api.validation
     const {
         List,
-        ListItem
+        ListItem,
+        User
     } = app.models.index
 
     const save = (req, res) => {
@@ -36,7 +37,7 @@ module.exports = app => {
 
         let listItems = list.listItems
         delete list.listItems
-
+        console.log(listItems)
         app.bookshelf.transaction(t => {
                 return new List(list)
                     .save(null, {
@@ -54,7 +55,10 @@ module.exports = app => {
                     })
             })
             .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
+            .catch(err => {
+                console.log(err)
+                return res.status(500).send(err)
+            })
     }
 
     const edit = async (req, res) => {
@@ -63,6 +67,10 @@ module.exports = app => {
         const list = {
             ...req.body
         }
+        delete list.owner
+        delete list.picker
+        delete list.store
+
         list.id = req.params.id
         let listFromDb
         try {
@@ -80,37 +88,40 @@ module.exports = app => {
 
         if (listFromDb.get('pickerId') === user.id) {
             let items = _.map(list.listItems, item => _.pick(item, ['id', 'cost']))
-            let body = _.pick(req.body, ['receiptNumber'], item.reduce((a,b) => a+b))
+            let body = _.pick(req.body, ['receiptNumber'], item.reduce((a, b) => a + b))
             let cost;
             try {
-                for(let item of items) {
+                for (let item of items) {
                     isNumber(item.cost, 'Final cost is invalid')
                 }
             } catch (msg) {
                 return res.status(400).send(msg)
             }
             app.bookshelf.transaction(t => {
-                return List
-                    .where({'id': list.id, pickerId: user.id})
-                    .save(body, {
-                        method: 'update',
-                        patch: true,
-                        transacting: t
-                    })
-                    .tap(body => {
-                        return Promise.map(items, (item) =>
-                            new ListItem(item)
-                            .save({
-                                'listId': list.id
-                            }, {
-                                transacting: t
-                            })
-                        )
-                    })
-                    .then()
-            })
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
+                    return List
+                        .where({
+                            'id': list.id,
+                            pickerId: user.id
+                        })
+                        .save(body, {
+                            method: 'update',
+                            patch: true,
+                            transacting: t
+                        })
+                        .tap(body => {
+                            return Promise.map(items, (item) =>
+                                new ListItem(item)
+                                .save({
+                                    'listId': list.id
+                                }, {
+                                    transacting: t
+                                })
+                            )
+                        })
+                        .then()
+                })
+                .then(_ => res.status(204).send())
+                .catch(err => res.status(500).send(err))
 
         } else if (listFromDb.get('ownerId') === user.id) {
             let body = _.pick(req.body, ['storeId'])
@@ -130,7 +141,10 @@ module.exports = app => {
 
             app.bookshelf.transaction(t => {
                     return List
-                        .where({'id': list.id, 'ownerId': user.id})
+                        .where({
+                            'id': list.id,
+                            'ownerId': user.id
+                        })
                         .save(body, {
                             method: 'update',
                             patch: true,
@@ -155,49 +169,69 @@ module.exports = app => {
         }
     }
     const confirmDelivery = async (req, res) => {
-        
+
         // const user = req.user
-        const user = {id: 1}
+        const user = {
+            id: 1
+        }
 
         try {
             isValidID(req.params.id, "ID not valid.")
-            const list = await new List({id: req.params.id, ownerId: user.id })
+            const list = await new List({
+                    id: req.params.id,
+                    ownerId: user.id
+                })
                 .query(qb => {
                     qb.havingNotNull('deliveredAt')
                     qb.groupBy('id')
                 })
                 .fetch()
-                existsOrError(list, 'List not found or not delivered yet.')
+            existsOrError(list, 'List not found or not delivered yet.')
 
-                List
-                    .forge({id: list.id, ownerId: list.ownerId})
-                    .save({ confirmedAt: new Date(Date.now()) })
-                    .then(_ => res.status(200).send())
-                    .catch(err => res.status(500).send(err))
-        } catch(msg) {
+            List
+                .forge({
+                    id: list.id,
+                    ownerId: list.ownerId
+                })
+                .save({
+                    confirmedAt: new Date(Date.now())
+                })
+                .then(_ => res.status(200).send())
+                .catch(err => res.status(500).send(err))
+        } catch (msg) {
             return res.status(400).send(msg)
         }
     }
 
     const deliver = async (req, res) => {
-        
+
         // const user = req.user
-        const user = {id: 2}
+        const user = {
+            id: 2
+        }
 
         try {
             isValidID(req.params.id, "ID not valid.")
-            const list = await new List({id: req.params.id, pickerId: user.id })
+            const list = await new List({
+                    id: req.params.id,
+                    pickerId: user.id
+                })
                 .fetch()
-                console.log(list)
+            console.log(list)
 
-                existsOrError(list, 'List not found.')
+            existsOrError(list, 'List not found.')
 
-                List
-                    .forge({id: list.id, pickerId: list.pickerId})
-                    .save({ deliveredAt: new Date(Date.now()) })
-                    .then(_ => res.status(200).send())
-                    .catch(err => res.status(500).send(err))
-        } catch(msg) {
+            List
+                .forge({
+                    id: list.id,
+                    pickerId: list.pickerId
+                })
+                .save({
+                    deliveredAt: new Date(Date.now())
+                })
+                .then(_ => res.status(200).send())
+                .catch(err => res.status(500).send(err))
+        } catch (msg) {
             return res.status(400).send(msg)
         }
     }
@@ -208,35 +242,43 @@ module.exports = app => {
             isValidID(req.params.id, "ID not valid.")
 
             const listPicker = await List
-                .fetch('pickerId')
                 .where({
                     id: req.params.id,
                     ownerId: user.id
                 })
-            notExistsOrError(listPicker, 'List cannot be deleted. A picker has picked it.')
+                .fetch({columns: 'pickerId'})
+            notExistsOrError(listPicker.get('id'), 'List cannot be deleted. A picker has picked it.')
 
             const rowsDeleted = await new List({
                 id: req.params.id
             }).destroy()
 
             try {
-                existsOrError(rowsDeleted.message, 'List not found.')
+                notExistsOrError(rowsDeleted.message, 'List not found.')
             } catch (msg) {
                 return res.status(400).send(msg)
             }
             res.status(204).send()
         } catch (msg) {
+            console.log(msg)
             return res.status(500).send(msg)
         }
     }
-    
+
     const get = async (req, res) => {
         const page = req.query.page || 1
 
         List
             .query(qb => qb)
-            .fetchPage({columns: ['id', 'totalItems', 'storeId', 'ownerId', 'pickerId'], pageSize: 10, page })
-            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .fetchPage({
+                columns: ['id', 'totalItems', 'storeId', 'ownerId', 'pickerId'],
+                pageSize: 10,
+                page
+            })
+            .then(lists => res.status(200).json({
+                lists,
+                pagination: lists.pagination
+            }))
             .catch(err => res.status(500).send(err))
     }
 
@@ -246,15 +288,21 @@ module.exports = app => {
             isValidID(req.params.id, 'ID not valid.')
             List
                 .where('id', req.params.id)
-                .fetch({withRelated: 'listItems'})
-                .then(list => { 
-                    if(list) {
-                        return res.status(200).json(list)
-                    }
-                    return res.status(204).send()  
+                .fetch({
+                    withRelated: ['listItems', 'store',
+                        {
+                            'owner': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                        },
+                        {
+                            'picker': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                        },
+                    ]
                 })
-                .catch(err => res.status(500).send(err))
-        }catch(msg) {
+                .then(list => {
+                    return res.status(200).json(list)
+                })
+                .catch(err => console.log(err))
+        } catch (msg) {
             return res.status(400).send(msg)
         }
     }
@@ -264,13 +312,23 @@ module.exports = app => {
         const user = req.user
         List
             .query(qb => {
-                qb.where({ownerId: user.id})
-                qb.orWhere({pickerId: user.id})
+                qb.where({
+                    ownerId: user.id
+                })
+                qb.orWhere({
+                    pickerId: user.id
+                })
                 qb.havingNotNull('confirmedAt')
                 qb.groupBy('id')
             })
-            .fetchPage({ pageSize: 10, page })
-            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .fetchPage({
+                pageSize: 10,
+                page
+            })
+            .then(lists => res.status(200).json({
+                lists,
+                pagination: lists.pagination
+            }))
             .catch(err => res.status(500).send(err))
     }
 
@@ -279,10 +337,18 @@ module.exports = app => {
         const user = req.user
         List
             .query(qb => {
-                qb.where({pickerId: user.id})
+                qb.where({
+                    pickerId: user.id
+                })
             })
-            .fetchPage({ pageSize: 10, page })
-            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .fetchPage({
+                pageSize: 10,
+                page
+            })
+            .then(lists => res.status(200).json({
+                lists,
+                pagination: lists.pagination
+            }))
             .catch(err => res.status(500).send(err))
     }
 
@@ -291,10 +357,18 @@ module.exports = app => {
         const user = req.user
         List
             .query(qb => {
-                qb.where({ownerId: user.id})
+                qb.where({
+                    ownerId: user.id
+                })
             })
-            .fetchPage({ pageSize: 10, page })
-            .then(lists => res.status(200).json({lists, pagination: lists.pagination}))
+            .fetchPage({
+                pageSize: 10,
+                page
+            })
+            .then(lists => res.status(200).json({
+                lists,
+                pagination: lists.pagination
+            }))
             .catch(err => res.status(500).send(err))
     }
 

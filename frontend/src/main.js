@@ -18,10 +18,6 @@ Vue.use(VueGoogleMaps, {
 
 Vue.config.productionTip = false
 
-
-require('axios').defaults.headers.common['Authorization'] = 
-    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoiV2FnbmVyIiwibGFzdE5hbWUiOiJEJ0FtYXJhbCIsImVtYWlsIjoid3JkYW1hcmFsQGdtYWlsLmNvbSIsImFkbWluIjp0cnVlLCJjcmVhdGVkQXQiOiIyMDE5LTAzLTA2VDAyOjAyOjI0LjgxNloiLCJ1cGRhdGVkQXQiOm51bGwsImlhdCI6MTU1MzAwNzMyNiwiZXhwIjoxNTUzMDkzNzI2fQ.iyKZcVH65nI4xczTyaEwywgwAnL07AZ7oedawKyWR7E'
-
 new Vue({
   store,
   router,

@@ -5,15 +5,15 @@
             <router-view></router-view>
         </v-content>
         <v-snackbar
-          v-model="appState.snackbar"
+          v-model="snackbar"
           bottom
-          :timeout="appState.timeout"
+          :timeout="timeout"
         >
-          {{ appState.snackText }}
+          {{ snackText }}
           <v-btn
             color="pink"
             flat
-            @click="appState.snackbar = false"
+            @click="hideSnackbar"
           >
             Close
           </v-btn>
@@ -28,10 +28,19 @@ import { mapState } from 'vuex'
 export default {
   name: 'App',
   components: { AppNavigation },
-  computed: 
-    mapState({
-        appState: state => state
+  computed: {
+    ...mapState({
+      user: state => state.user,
+      snackbar: state => state.snackbar,
+      snackText: state => state.snackText,
+      timeout: state => state.timeout
     }),
+  },
+  methods: {
+    hideSnackbar() {
+      this.$store.commit('hideSnackbar')
+    }
+  },
 }
 </script>
 <style>

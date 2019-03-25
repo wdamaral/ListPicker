@@ -1,49 +1,46 @@
 module.exports = app => {
-    const { existsOrError, isValidID } = app.api.validation
+    const { notExistsOrError, existsOrError, isValidID } = app.api.validation
     const { ListItem } = app.models.index
 
     const save = (req, res) => {
-        const listItems = { ...req.body }
-        if(req.params.id) listItem.id = req.params.id
-
+        const item = { ...req.body }
+        if(req.params.itemId) listItem.id = req.params.itemId
         try {
-            for(let item of listItems) {
-                existsOrError(item.item, 'Item cannot be blank.')
+                existsOrError(item.item, 'Item name cannot be blank.')
                 existsOrError(item.quantity, 'Quantity cannot be blank.')
                 existsOrError(item.unit, 'Unit cannot be blank.')
-                existsOrError(item.listId, 'List ID not valid')
-            }
+                existsOrError(item.listId, 'List not found.')
             
         } catch(msg) {
             res.status(400).send(msg)
         }
-
-        if(list.id) {
-            app.db('listItems')
-                .update(listItem)
-                .where({ id: listItem.id })
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
-        } else {
-            app.db('listItems')
-                .insert(listItem)
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
-        }
+        
+        app.db('listItems')
+            .insert(item)
+            .then(_ => res.status(204).send())
+            .catch(err => {
+                console.log(err)
+                return res.status(500).send(err)})
+        
     }
     const remove = async (req, res) => {
+        const listId = req.params.listId
+        const itemId = req.params.itemId
         try {
-            isValidID(req.params.itemId, "ID not valid.")
+            isValidID(listId, "Item not found for this list.")
+            isValidID(itemId, "Item not found for this list.")
             
-            let listId = req.params.id
-            let itemId = req.params.itemId
-            let rowsDeleted = new ListItem({id: itemId, listId}).destroy()
+            let item = await ListItem.where({ listId, id: itemId }).fetch()
+                existsOrError(item, 'Item not found for this list.')
+
+            let rowsDeleted = await new ListItem(item).destroy()
                 try {
-                    notExistsOrError(rowsDeleted.message, 'List not found.')
+                    notExistsOrError(rowsDeleted.message, 'Item not found for this list.')
                 } catch(msg) {
+                    console.log(msg)
                     return res.status(400).send(msg)
                 }
-                return res.status(204).send()
+                return res.status(204).send('Item removed.')
             } catch(msg) {
                 return res.status(500).send(msg)
             }

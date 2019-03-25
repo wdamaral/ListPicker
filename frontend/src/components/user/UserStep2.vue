@@ -10,7 +10,7 @@
             <v-layout row>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.street"
+                v-model="user.userRegistration.street"
                 append-icon="home"
                 :counter="100"
                 :rules="streetRules"
@@ -20,7 +20,7 @@
             </v-flex>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.unit"
+                v-model="user.userRegistration.unit"
                 :counter="10"
                 label="Unit #"
             ></v-text-field>
@@ -29,7 +29,7 @@
             <v-layout row>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.city"
+                v-model="user.userRegistration.city"
                 :counter="50"
                 :rules="cityRules"
                 label="City"
@@ -38,7 +38,7 @@
             </v-flex>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.province"
+                v-model="user.userRegistration.province"
                 :rules="provinceRules"
                 label="Province"
                 mask="AA"
@@ -47,7 +47,7 @@
             </v-flex>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.postalCode"
+                v-model="user.userRegistration.postalCode"
                 :rules="postalRules"
                 label="Postal Code"
                 mask="A#A #A#"

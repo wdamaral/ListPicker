@@ -8,6 +8,12 @@ import StoreAdmin from '@/components/admin/store/StoreAdmin'
 import SignIn from '@/components/user/SignIn'
 import EditUser from '@/components/user/EditUser'
 import UserProfile from '@/components/user/UserProfile'
+import ListIndex from '@/components/list/ListIndex'
+import NewList from '@/components/list/NewList'
+import EditList from '@/components/list/EditList'
+import Lists from '@/components/list/Lists'
+import ListDetails from '@/components/list/ListDetails'
+import Login from '@/components/auth/Login'
 
 Vue.use(VueRouter)
 
@@ -36,6 +42,21 @@ const routes = [{
         path: '/users/:id',
         component: UserProfile
     },
+    {
+        path: '/lists',
+        component: ListIndex,
+        children: [
+            { path: '', component: Lists },
+            { path: ':id', component: ListDetails },
+            { path: 'new', component: NewList },
+            { path: ':id/edit', component: EditList },
+        ]
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Login
+    }
 ]
 
 const router = new VueRouter({

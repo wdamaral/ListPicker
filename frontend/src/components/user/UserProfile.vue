@@ -37,7 +37,7 @@
                 <v-layout row wrap pa-3 align-content-center>
                     <v-flex xs12>
                         <p class="text-xs-center" >
-                            <Map/>
+                            <Map v-bind:latitude="user.data.latitude" v-bind:longitude="user.data.longitude"/>
                             </p>
                     </v-flex>
                 </v-layout>

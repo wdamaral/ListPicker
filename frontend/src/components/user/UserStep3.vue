@@ -14,7 +14,7 @@
             <v-text-field
                 label="Password"
                 class="mr-3"
-                v-model="user.data.password"
+                v-model="user.userRegistration.password"
                 :append-icon="showP ? 'visibility' : 'visibility_off'"
                 :rules="passwordRules"
                 :type="showP ? 'text' : 'password'"
@@ -27,7 +27,7 @@
                 label="Confirm password"
                 class="ml-3"
                 ref="password"
-                v-model="user.data.confirmPassword"
+                v-model="user.userRegistration.confirmPassword"
                 :append-icon="showC ? 'visibility' : 'visibility_off'"
                 :rules="confirmPasswordRules"
                 :type="showC ? 'text' : 'password'"

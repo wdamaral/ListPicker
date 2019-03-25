@@ -163,7 +163,7 @@ export default {
         }
         },
         loadStores() {
-            this.$store.dispatch('store/loadStores')
+            this.$store.dispatch('store/GET_STORES')
         },
     },
     mounted() {
@@ -171,7 +171,7 @@ export default {
     },
     computed: {
         listOfStores() {
-            return this.$store.getters['store/getStores']
+            return this.$store.getters['store/GET_STORES']
         }
     },
 }

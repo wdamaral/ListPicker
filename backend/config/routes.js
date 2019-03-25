@@ -21,8 +21,8 @@ module.exports = app => {
         .get(app.api.user.getById)
 
     app.route('/stores')
-        .all(app.config.passport.authenticate())
-        .get(admin(app.api.store.get))
+        //.all(app.config.passport.authenticate())
+        .get(app.api.store.get)
         .post(admin(app.api.store.save))
 
     app.route('/stores/:id')
@@ -43,8 +43,9 @@ module.exports = app => {
         .delete(app.api.list.remove)
 
     app.route('/lists/:id/items')
-        //.all(app.config.passport.authenticate())
+        .all(app.config.passport.authenticate())
         .get(app.api.listItem.getByListId)
+        .post(app.api.listItem.save)
 
     app.route('/lists/:id/confirm-delivery')
         //.all(app.config.passport.authenticate())
@@ -66,9 +67,9 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .post(listPicker(app.api.list.getOwnedByUserId))
 
-    app.route('/lists/:id/items/:itemId')
+    app.route('/lists/:listId/items/:itemId/delete')
         .all(app.config.passport.authenticate())
-        .post(app.api.listItem.remove)
+        .delete(app.api.listItem.remove)
 
     app.route('/upload')
         .post(app.api.imageUpload.uploadPicture)

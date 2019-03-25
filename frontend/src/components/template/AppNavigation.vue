@@ -8,8 +8,9 @@
         <v-toolbar-title>{{appTitle}}</v-toolbar-title>
         <img :src="require('../../assets/logo.png')" id="logo" class="hidden-md-and-up" alt="Grocery List Picker">
         <v-spacer class="hidden-sm-and-down"></v-spacer>
-        <v-btn flat class="hidden-sm-and-down">SIGN IN</v-btn>
-        <v-btn color="teal lighten-2" class="hidden-sm-and-down">JOIN</v-btn>
+        <v-btn v-if="!user.data" flat class="hidden-sm-and-down" @click="login">SIGN IN</v-btn>
+        <v-btn v-if="user.data" flat @click="logout" class="hidden-sm-and-down">LOGOUT</v-btn>
+        <v-btn color="teal lighten-2" class="hidden-sm-and-down" @click="signup">JOIN</v-btn>
     </v-toolbar>
     <v-navigation-drawer
         v-model="drawer"
@@ -64,8 +65,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'AppNavigation',
+    computed: {
+      ...mapState({
+        user: state => state.user
+      })
+    },
     data() {
         return {
             appTitle: 'Grocery List Picker',
@@ -78,7 +85,20 @@ export default {
             mini: false,
             right: null   
         };
-    }
+    },
+    methods: {
+      logout() {
+        this.$store.dispatch('user/LOGOUT',this.$router)
+
+      },
+      signup() {
+        this.$router.push('/signin')
+      },
+      login() {
+        this.$router.push('/login')
+      }
+
+    },
 
 };
 </script>
