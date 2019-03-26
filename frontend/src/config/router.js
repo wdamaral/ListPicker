@@ -47,8 +47,8 @@ const routes = [{
         component: ListIndex,
         children: [
             { path: '', component: Lists },
-            { path: ':id', component: ListDetails },
             { path: 'new', component: NewList },
+            { path: ':id', component: ListDetails },
             { path: ':id/edit', component: EditList },
         ]
     },

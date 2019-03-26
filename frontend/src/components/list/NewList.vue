@@ -195,7 +195,6 @@ export default {
       }
     },
     async save() {
-      console.log(this.getItemsSize);
       if (this.getItemsSize > 0) {
         await this.$store.dispatch("list/INSERT", this.$router);
       } else {
@@ -212,13 +211,13 @@ export default {
       this.$store.commit("list/SHOW_MODAL");
     },
     deleteItem(item) {
-        confirm("Are you sure you want to delete this item?") &&
-          this.$store.commit("list/DELETE_ITEM", item)
+      confirm("Are you sure you want to delete this item?") &&
+        this.$store.commit("list/DELETE_ITEM", item);
     }
   },
   mounted() {
-    this.$store.commit('list/SET_MODE', 'NEW');
-    this.$store.dispatch('store/GET_STORES');
+    this.$store.commit("list/SET_MODE", "NEW");
+    this.$store.dispatch("store/GET_STORES");
   }
 };
 </script>

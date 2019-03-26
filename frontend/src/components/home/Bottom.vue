@@ -7,6 +7,7 @@
               class="red lighten-2 mt-5"
               dark
               large
+              @click="$router.push('/login')"
             >
               Get Started
             </v-btn>
