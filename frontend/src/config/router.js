@@ -8,7 +8,7 @@ import StoreAdmin from '@/components/admin/store/StoreAdmin'
 import SignIn from '@/components/user/SignIn'
 import EditUser from '@/components/user/EditUser'
 import UserProfile from '@/components/user/UserProfile'
-import ListIndex from '@/components/list/ListIndex'
+import List from '@/components/list/List'
 import NewList from '@/components/list/NewList'
 import EditList from '@/components/list/EditList'
 import Lists from '@/components/list/Lists'
@@ -44,7 +44,7 @@ const routes = [{
     },
     {
         path: '/lists',
-        component: ListIndex,
+        component: List,
         children: [
             { path: '', component: Lists },
             { path: 'new', component: NewList },

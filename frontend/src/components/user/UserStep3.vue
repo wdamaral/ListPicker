@@ -44,8 +44,8 @@
                     size="80"
                     color="grey lighten-4"
                 >
-                    <img v-if="getImageUrl !==''" :src="`${getPath}${getImageUrl}`" alt="avatar">
-                    <img v-if="getImageUrl ===''" :src="require('../../assets/avatar_profile.png')" alt="avatar">
+                    <img v-if="user.userRegistration.profilePicture" :src="`${getPath}${getImageUrl}`" alt="avatar">
+                    <img v-else :src="require('../../assets/avatar_profile.png')" alt="avatar">
                 </v-avatar>
                 </p>
             </v-flex>
@@ -132,7 +132,8 @@ export default {
                 v => (v && v.length >= 8) || 'Password must have at least 8 characters'
             ],
             confirmPasswordRules: [
-                (v) => !!v || 'Confirmation password is required'
+                (v) => !!v || 'Confirmation password is required',
+                (v) => (v && v === user.userRegistration.password) || 'Password does not match'
             ]
         }
     },

@@ -38,25 +38,33 @@ export default {
             return state.stores
         },
         GET_SELECTED_STORE_IMAGE: (state) => (payload) => {
-           let store = state.stores.stores.find(store => store.id === payload)
+            let store = state.stores.stores.find(store => store.id === payload)
             return store.imageUrl
+        },
+        GET_PAGINATION(state) {
+            return state.stores.pagination
         }
     },
     actions: {
-        save({
+        SAVE({
             commit,
-            state
-        }) {
-            const method = state.data.id ? 'put' : 'post'
-            const id = state.data.id ? `/${state.data.id}` : ''
-            commit('storeLogoPicture')
-            axios[method](`${baseApiUrl}/stores/${id}`, state.data)
+            dispatch
+        }, store) {
+            const method = store.store.id ? 'put' : 'post'
+            const id = store.store.id ? `/${store.store.id}` : ''
+
+            axios[method](`${baseApiUrl}/stores${id}`, store)
                 .then(() => {
-                    commit('activeSnackbar', 'Success! Store created.', {
+                    let msg
+                    if (id) {
+                        msg = 'Success! Store updated.'
+                    } else {
+                        msg = 'Success! Store created.'
+                    }
+                    commit('activeSnackbar', msg, {
                         root: true
                     })
-                    commit('resetAll')
-                    //router.push('/')
+                    dispatch('GET_STORES')
                 })
                 .catch(err => {
                     let error
@@ -71,10 +79,10 @@ export default {
                     })
                 })
         },
-        upload({
+        UPLOAD({
             commit
         }, event) {
-            const url = `${baseApiUrl}/upload`
+            const url = `${baseApiUrl}/temp`
             let data = new FormData()
             let file = event.target.files[0]
             if (!file) {
@@ -94,13 +102,10 @@ export default {
 
             axios.post(url, data, config).then(
                 response => {
-                    commit('fileName', {
-                        fileUrl: response.data.filePath,
-                        showPreview: true
-                    })
                     commit('activeSnackbar', 'Picture uploaded.', {
                         root: true
                     })
+                    return response.data.filePath
                 }).catch(err => {
                 let error
                 if (err.response.data) {
@@ -108,10 +113,10 @@ export default {
                 } else {
                     error = err
                 }
-
                 commit('activeSnackbar', error, {
                     root: true
                 })
+                return 'fail'
             })
         },
         GET_STORES({
@@ -123,6 +128,33 @@ export default {
                 .get(url)
                 .then(stores =>
                     commit('SET_STORES', stores.data))
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        REMOVE({
+            commit,
+            dispatch
+        }, store) {
+            const url = `${baseApiUrl}/stores/${store.id}`
+
+            axios
+                .delete(url)
+                .then(() => {
+                    commit('activeSnackbar', 'Store removed.', {
+                        root: true
+                    })
+                    dispatch('GET_STORES')
+                })
                 .catch(err => {
                     let error
                     if (err.response.data) {

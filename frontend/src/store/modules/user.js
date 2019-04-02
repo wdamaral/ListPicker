@@ -36,7 +36,7 @@ export default {
             state.showPreview = payload.showPreview
         },
         userProfilePicture(state) {
-            state.data.profilePicture = state.fileUrl
+            state.userRegistration = state.fileUrl
         },
         SET_USER(state, payload) {
             state.data = payload
@@ -65,27 +65,6 @@ export default {
         imageUrl(state) {
             return state.fileUrl
         },
-        activeLists(state) {
-            return state.data.lists.filter(list => list.pickerId === null)
-        },
-        lastDeliveryConfirmed(state) {
-            if (state.data.lists) {
-                return state.data.listsPick.reduce((m, i) => (i.deliveredAt > m) && i || m, "")
-                    .deliveredAt;
-            }
-        },
-        lastListPicked(state) {
-            if (state.data.listsPick) {
-                return state.data.lists.reduce((m, i) => (i.pickedAt > m) && i || m, "")
-                    .pickedAt;
-            }
-        },
-        lastListFulfilled(state) {
-            if (state.data.lists) {
-                return state.data.lists.reduce((m, i) => (i.confirmedAt > m) && i || m, "")
-                    .confirmedAt;
-            }
-        }
 
     },
     actions: {

@@ -110,7 +110,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { baseApiUrl } from '@/global'
+import { baseApiUrl, baseProfilePicUrl } from '@/global'
 export default {
     name: 'AppNavigation',
     computed: {
@@ -121,7 +121,7 @@ export default {
     data() {
         return {
             appTitle: 'Grocery List Picker',
-            baseUrl: `${baseApiUrl}/uploads/users/`,
+            baseUrl: baseProfilePicUrl,
             drawer: false,
             items: [
                 { title: 'Lists', icon: 'list', route: '/lists' },

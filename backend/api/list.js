@@ -6,7 +6,8 @@ module.exports = app => {
         existsOrError,
         notExistsOrError,
         isValidID,
-        isNumber
+        isNumber,
+        differentOrError
     } = app.api.validation
     const {
         List,
@@ -37,7 +38,7 @@ module.exports = app => {
 
         let listItems = list.listItems
         delete list.listItems
-        console.log(listItems)
+        list.totalItems = listItems.length
         app.bookshelf.transaction(t => {
                 return new List(list)
                     .save(null, {
@@ -56,14 +57,14 @@ module.exports = app => {
             })
             .then(_ => res.status(204).send())
             .catch(err => {
-                console.log(err)
+                // console.log(err)
                 return res.status(500).send(err)
             })
     }
 
     const edit = async (req, res) => {
         const user = req.user
-        // console.log(req.body)
+
         const list = {
             ...req.body
         }
@@ -164,76 +165,127 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            if (listFromDb.get('pickerId')) return res.status(400).send('You cannot edit lists that have already been picked.')
-            return res.status(400).send('You are neither the owner nor the picker of this list.')
+            if (listFromDb.get('pickerId')) return res.status(403).send('You cannot edit lists that have already been picked.')
+            return res.status(403).send('You are neither the owner nor the picker of this list.')
         }
     }
     const confirmDelivery = async (req, res) => {
-
-        // const user = req.user
-        const user = {
-            id: 1
-        }
-
+        const user = req.user
+        let list
         try {
             isValidID(req.params.id, "ID not valid.")
-            const list = await new List({
+            list = await new List({
                     id: req.params.id,
-                    ownerId: user.id
-                })
-                .query(qb => {
-                    qb.havingNotNull('deliveredAt')
-                    qb.groupBy('id')
+                    ownerId: user.id,
+                    isBought: true,
+                    isDelivered: true
                 })
                 .fetch()
-            existsOrError(list, 'List not found or not delivered yet.')
+            existsOrError(list, 'List cannot be confirmed yet. It might not be delivered.')
 
-            List
-                .forge({
-                    id: list.id,
-                    ownerId: list.ownerId
-                })
-                .save({
-                    confirmedAt: new Date(Date.now())
-                })
-                .then(_ => res.status(200).send())
-                .catch(err => res.status(500).send(err))
         } catch (msg) {
             return res.status(400).send(msg)
         }
+
+
+        List
+            .forge({
+                id: list.id,
+                ownerId: list.ownerId
+            })
+            .save({
+                isConfirmed: true,
+                confirmedAt: new Date(Date.now())
+            })
+            .then(_ => res.status(200).send())
+            .catch(err => res.status(500).send(err))
     }
 
     const deliver = async (req, res) => {
+        const user = req.user
 
-        // const user = req.user
-        const user = {
-            id: 2
-        }
-
+        let list
         try {
             isValidID(req.params.id, "ID not valid.")
-            const list = await new List({
+            list = await new List({
                     id: req.params.id,
-                    pickerId: user.id
+                    pickerId: user.id,
+                    isBought: true,
+                    isDelivered: false
                 })
                 .fetch()
-            console.log(list)
 
-            existsOrError(list, 'List not found.')
 
-            List
-                .forge({
-                    id: list.id,
-                    pickerId: list.pickerId
-                })
-                .save({
-                    deliveredAt: new Date(Date.now())
-                })
-                .then(_ => res.status(200).send())
-                .catch(err => res.status(500).send(err))
+            existsOrError(list, 'You cannot edit the status of this list.')
+
+            try {
+                existsOrError(list.get('receiptNumber'), 'Please, update the receipt number first.')
+            } catch (msg) {
+                return res.status(400).send(msg)
+            }
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(403).send(msg)
         }
+
+        List
+            .forge({
+                id: list.id,
+                pickerId: list.pickerId,
+                isBought: true,
+                isDelivered: false
+            })
+            .save({
+                isDelivered: true,
+                deliveredAt: new Date(Date.now())
+            }, {
+                method: 'update',
+                patch: true
+            })
+            .then(_ => res.status(200).send())
+            .catch(err => res.status(500).send(err))
+    }
+
+    const markBought = async (req, res) => {
+        const user = req.user
+        try {
+            isValidID(req.params.id, "ID not valid.")
+
+            const list = await List.forge({
+                id: req.params.id,
+                pickerId: user.id,
+                isBought: false
+            }).fetch({
+                withRelated: 'listItems'
+            })
+
+            existsOrError(list, 'You cannot edit the status of this list.')
+
+            try {
+                for (const listItem of list.related('listItems')) {
+                    existsOrError(listItem.get('cost'), 'All items must have a price.')
+                    existsOrError(listItem.get('qtyBought'), 'All items must have the quantity bought.')
+                }
+                existsOrError(list.get('receiptNumber'), 'Please, update the receipt number first.')
+            } catch (msg) {
+                return res.status(400).send(msg)
+            }
+
+        } catch (msg) {
+            console.log(msg)
+            return res.status(403).send(msg)
+        }
+
+        List
+            .forge({
+                id: list.id,
+                pickerId: list.pickerId
+            })
+            .save({
+                isBought: true,
+                boughtAt: new Date(Date.now())
+            })
+            .then(_ => res.status(200).send())
+            .catch(err => res.status(500).send(err))
     }
 
     const remove = async (req, res) => {
@@ -246,7 +298,9 @@ module.exports = app => {
                     id: req.params.id,
                     ownerId: user.id
                 })
-                .fetch({columns: 'pickerId'})
+                .fetch({
+                    columns: 'pickerId'
+                })
             notExistsOrError(listPicker.get('id'), 'List cannot be deleted. A picker has picked it.')
 
             const rowsDeleted = await new List({
@@ -260,7 +314,6 @@ module.exports = app => {
             }
             res.status(204).send()
         } catch (msg) {
-            console.log(msg)
             return res.status(500).send(msg)
         }
     }
@@ -271,8 +324,9 @@ module.exports = app => {
         List
             .query(qb => qb)
             .fetchPage({
-                columns: ['id', 'totalItems', 'storeId', 'ownerId', 'pickerId'],
-                pageSize: 10,
+                withRelated: ['owner', 'picker', 'store'],
+                columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
+                pageSize: 12,
                 page
             })
             .then(lists => res.status(200).json({
@@ -301,7 +355,7 @@ module.exports = app => {
                 .then(list => {
                     return res.status(200).json(list)
                 })
-                .catch(err => console.log(err))
+                .catch(err => res.status(500).send(err))
         } catch (msg) {
             return res.status(400).send(msg)
         }
@@ -372,6 +426,46 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
     }
 
+    const pickList = async (req, res) => {
+        const user = req.user
+        const listId = req.params.listId
+
+        try {
+            existsOrError(listId, 'List not selected')
+            existsOrError(user, 'User not registered')
+            const list = await List
+                .forge({
+                    id: listId
+                })
+                .fetch()
+
+            existsOrError(list, 'List not found.')
+            notExistsOrError(list.get('pickerId'), 'This listed is already picked')
+
+            try {
+                differentOrError(list.get('ownerId'), user.id, 'Owner cannot pick the list')
+            } catch (msg) {
+                return res.status(403).send(msg)
+            }
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+
+        List
+            .forge({
+                id: listId
+            })
+            .save({
+                pickerId: user.id,
+                pickedAt: new Date(Date.now())
+            }, {
+                method: 'update',
+                patch: true
+            })
+            .then(_ => res.status(200).send())
+            .catch(err => res.status(500).send(err))
+
+    }
 
     return {
         save,
@@ -383,6 +477,8 @@ module.exports = app => {
         deliver,
         getHistoryByUserId,
         getPickedByUserId,
-        getOwnedByUserId
+        getOwnedByUserId,
+        markBought,
+        pickList
     }
 }

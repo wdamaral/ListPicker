@@ -11,8 +11,6 @@ export default {
         list: {
             listItems: []
         },
-        //itemIndex: -1,
-        //listSelected: -1,
         editedItem: {},
         addItemModal: false,
         mode: 'NEW'
@@ -42,6 +40,24 @@ export default {
         },
         SET_SELECTED_LIST(state, payload) {
             state.selectedList = payload
+        },
+        SET_BOUGHT(state, payload) {
+            state.boughtAt = payload
+        },
+        SET_DELIVERED(state) {
+            state.deliveredAt = Date.now
+        },
+        SET_CONFIRMED(state) {
+            state.confirmedAt = Date.now
+        },
+        SET_IS_BOUGHT(state, payload) {
+            state.list.isBought = payload
+        },
+        SET_IS_DELIVERED(state, payload) {
+            state.list.isDelivered = payload
+        },
+        SET_IS_CONFIRMED(state, payload) {
+            state.list.isConfirmed = payload
         }
     },
     getters: {
@@ -59,7 +75,17 @@ export default {
         },
         GET_ITEMS_LENGTH(state) {
             return state.list.listItems.length
-        }
+        },
+        GET_BOUGHT(state) {
+            return state.list.boughtAt
+        },
+        GET_DELIVERED(state) {
+            return state.list.deliveredAt
+        },
+        GET_CONFIRMED(state) {
+            return state.list.confirmedAt
+        },
+
     },
     actions: {
         INSERT({
@@ -99,6 +125,144 @@ export default {
                         root: true
                     })
                     router.push('/lists')
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        PICKER_UPDATE_LIST({
+            commit,
+            dispatch,
+            state
+        }) {
+            const editedItem = {
+                cost: state.editedItem.cost,
+                qtyBought: state.editedItem.qtyBought
+            }
+
+            const url = `${baseApiUrl}/lists/${state.list.id}/items/${state.editedItem.id}`
+
+            axios
+                .put(url, editedItem)
+                .then(() => {
+                    commit('activeSnackbar', 'Success! Item updated.', {
+                        root: true
+                    })
+                    dispatch('GET_LIST', state.list.id)
+                    commit('SET_EDITED_ITEM', {})
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        UPDATE_STATUS({
+            commit,
+            dispatch,
+            state
+        }, status) {
+            let url = `${baseApiUrl}/lists/${state.list.id}`
+            let newStatus
+            if (status === 'bought') {
+                console.log('bought')
+                url += '/bought'
+            }
+            if (status === 'delivered') {
+                url += '/delivered'
+            }
+            if (status === 'confirmed') {
+                url += '/confirmed'
+            }
+            axios
+                .put(url, newStatus)
+                .then(() => {
+                    commit('activeSnackbar', 'Success! Status updated.', {
+                        root: true
+                    })
+                    dispatch('GET_LIST', state.list.id)
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                    if (status === 'bought') {
+                        commit('SET_IS_BOUGHT', false)
+                    }
+                    if (status === 'delivered') {
+                        commit('SET_IS_DELIVERED', false)
+                    }
+                    if (status === 'confirmed') {
+                        commit('SET_IS_CONFIRMED', false)
+                    }
+                })
+        },
+        PICK_LIST({
+            commit,
+            dispatch,
+            state
+        }) {
+            const url = `${baseApiUrl}/lists/${state.list.id}/pick`
+
+            axios
+                .post(url)
+                .then(() => {
+                    commit('activeSnackbar', `You've picked this list`, {
+                        root: true
+                    })
+                    dispatch('GET_LIST', state.list.id)
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        SAVE_RECEIPT({
+            commit,
+            dispatch,
+            state
+        }) {
+            const url = `${baseApiUrl}/lists/${state.list.id}`
+
+            axios
+                .put(url, state.list.receiptNumber)
+                .then(() => {
+                    dispatch('GET_LIST', state.list.id)
+
+                    commit('activeSnackbar', 'Success! Status updated.', {
+                        root: true
+                    })
+
                 })
                 .catch(err => {
                     let error

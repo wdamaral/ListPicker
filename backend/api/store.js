@@ -8,16 +8,59 @@ module.exports = app => {
         Store,
         List
     } = app.models.index
-    const save = (req, res) => {
+    const {
+        moveFile
+    } = app.api.imageUpload
+
+    const insert = (req, res) => {
         const store = {
-            ...req.body
+            ...req.body.store
         }
+        const uploads = req.body.uploads
+
         if (req.params.id) store.id = req.params.id
 
         try {
-            existsOrError(store.name, "Name cannot be blank")
-            existsOrError(store.description, "Description cannot be blank")
-            existsOrError(store.imageUrl, "Logo cannot be blank")
+            existsOrError(store.name, 'Name cannot be blank')
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+
+        if (uploads > 0) {
+            app.bookshelf.transaction(t => {
+                    let pic = store.imageUrl
+                    let saveStore = new Store(store).save(null, {
+                        transacting: t
+                    })
+                    let movePic = moveFile(pic, 'stores')
+                    return Promise.all([saveStore, movePic])
+                })
+                .then(_ => res.status(204).send())
+                .catch(err => {
+                    console.log(err)
+                    return res.status(500).send(err)
+                })
+        } else {
+
+            Store
+                .forge()
+                .save(store)
+                .then(_ => res.status(204).send())
+                .catch(err => res.status(500).send(err))
+        }
+
+    }
+
+    const update = (req, res) => {
+        const store = {
+            ...req.body.store
+        }
+        const uploads = req.body.uploads
+
+        if (req.params.id) store.id = req.params.id
+
+        try {
+            existsOrError(store.name, 'Name cannot be blank')
         } catch (msg) {
             return res.status(400).send(msg)
         }
@@ -29,27 +72,39 @@ module.exports = app => {
             } catch (msg) {
                 return res.status(400).send(msg)
             }
-            Store
-                .forge()
-                .save(store, {
-                    method: 'update'
-                })
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
-        } else {
-            Store
-                .forge()
-                .save(store, {
-                    method: 'insert'
-                })
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
+
+            if (uploads > 0) {
+                return app.bookshelf.transaction(t => {
+                        let pic = store.imageUrl
+                        let saveStore = new Store(store)
+                            .save(null, {
+                                transacting: t
+                            })
+                        let movePic = moveFile(pic, 'stores')
+                        return Promise.all([saveStore, movePic])
+                    })
+                    .then(_ => res.status(204).send())
+                    .catch(err => {
+                        console.log(err)
+                        return res.status(500).send(err)
+                    })
+
+            } else {
+                return Store
+                    .forge()
+                    .save(store, {
+                        method: 'update'
+                    })
+                    .then(_ => res.status(204).send())
+                    .catch(err => res.status(500).send(err))
+            }
+
         }
     }
 
     const remove = async (req, res) => {
         try {
-            isValidID(req.params.id, "ID not valid.")
+            isValidID(req.params.id, 'ID not valid.')
 
             const lists = await List
                 .where({
@@ -104,7 +159,8 @@ module.exports = app => {
     }
 
     return {
-        save,
+        insert,
+        update,
         remove,
         get,
         getById

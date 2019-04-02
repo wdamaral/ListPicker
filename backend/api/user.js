@@ -12,7 +12,8 @@ module.exports = app => {
         isValidPassword
     } = app.api.validation
     const {
-        User
+        User,
+        List
     } = app.models.index
     const {
         moveFile
@@ -27,9 +28,9 @@ module.exports = app => {
         const user = {
             ...req.body
         }
-        
+
         if (req.params.id) user.id = req.params.id
-        
+
         let userFromDB
         if (!req.originalUrl.startsWith('/users')) user.admin = false
         if (!req.user || !req.user.admin) user.admin = false
@@ -56,14 +57,16 @@ module.exports = app => {
                     id: user.id
                 })
                 .fetch()
-                
-                if(userFromDB.get('email') !== user.email) {
-                    const newUserEmail = await User
-                        .where({ email: user.email})
-                        .fetch()    
-                        notExistsOrError(newUserEmail, 'User already exists')
-                }
-            
+
+            if (userFromDB.get('email') !== user.email) {
+                const newUserEmail = await User
+                    .where({
+                        email: user.email
+                    })
+                    .fetch()
+                notExistsOrError(newUserEmail, 'User already exists')
+            }
+
 
         } catch (msg) {
             return res.status(400).send(msg)
@@ -83,7 +86,7 @@ module.exports = app => {
         user.password = encryptPassword(user.password)
         delete user.confirmPassword
 
-        if(user.profilePicture) {
+        if (user.profilePicture) {
             app.bookshelf.transaction(t => {
                     let pic = user.profilePicture
                     let saveUser = new User(user).save(null, {
@@ -97,15 +100,17 @@ module.exports = app => {
                     console.log(err)
                     res.status(500).send(err)
                 })
-        }else {
+        } else {
 
-        
+
             User
-                .forge({id: user.id})
+                .forge({
+                    id: user.id
+                })
                 .save(user)
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
-            }
+        }
     }
 
     const insert = async (req, res) => {
@@ -158,7 +163,7 @@ module.exports = app => {
         user.password = encryptPassword(user.password)
         delete user.confirmPassword
 
-        if(user.profilePicture) {
+        if (user.profilePicture) {
             app.bookshelf.transaction(t => {
                     let pic = user.profilePicture
                     let saveUser = new User(user).save(null, {
@@ -166,7 +171,7 @@ module.exports = app => {
                     })
                     let movePic = moveFile(pic, 'users')
                     return Promise.all([saveUser, movePic])
-    
+
                 })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
@@ -176,7 +181,7 @@ module.exports = app => {
                 .save(user)
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
-            }
+        }
     }
 
 
@@ -232,11 +237,42 @@ module.exports = app => {
         }
     }
 
+    const getAddress = async (req, res) => {
+        const listId = req.params.listId
+        console.log(listId)
+
+        try {
+            isValidID(listId, 'Invalid list ID')
+
+            const list = await List
+                .query(qb => qb.where({
+                        id: listId,
+                        pickerId: req.user.id
+                    })
+                    .orWhere({
+                        id: listId,
+                        ownerId: req.user.id
+                    }))
+                .fetch({
+                    withRelated: [{
+                        'owner': qb => qb.select(['street', 'unit', 'city', 'province', 'postalCode', 'phoneNumber', 'email', 'id'])
+                    }]
+                })
+
+            existsOrError(list, 'List not found.')
+            return res.status(200).send(list.related('owner'))
+        } catch (err) {
+            console.log(err)
+            return res.status(400).send(err)
+        }
+    }
+
     return {
         insert,
         update,
         get,
+        getAddress,
         getById,
-        encryptPassword
+        encryptPassword,
     }
 }
