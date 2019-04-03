@@ -71,19 +71,35 @@ export default {
 			return this.$store.getters["list/GET_ITEMS_LENGTH"];
 		}
 	},
-	methods: {
-		seeDetails(id) {
-			this.$router.push(`/lists/${id}`);
-		}
-	},
-	mounted() {
-		this.$store.dispatch("list/GET_LISTS");
-	},
 	filters: {
 		moment: date => {
 			if (date) return moment(date).format("MMMM Do, YYYY");
 
 			return "";
+		}
+	},
+	created() {
+		this.fetchData();
+	},
+	watch: {
+		$route: "fetchData"
+	},
+	methods: {
+		fetchData() {
+			switch (this.$route.path) {
+				case "/lists":
+					this.$store.dispatch("list/GET_LISTS");
+					break;
+				case "/lists/mylists":
+					this.$store.dispatch("list/GET_MY_LISTS");
+					break;
+				case "/lists/mypicks":
+					this.$store.dispatch("list/GET_MY_PICKS");
+					break;
+			}
+		},
+		seeDetails(id) {
+			this.$router.push(`/lists/${id}`);
 		}
 	}
 };

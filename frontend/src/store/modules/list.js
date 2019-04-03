@@ -181,7 +181,7 @@ export default {
             let url = `${baseApiUrl}/lists/${state.list.id}`
             let newStatus
             if (status === 'bought') {
-                console.log('bought')
+                // console.log('bought')
                 url += '/bought'
             }
             if (status === 'delivered') {
@@ -309,6 +309,49 @@ export default {
         }) {
             const url = `${baseApiUrl}/lists`
 
+            axios
+                .get(url)
+                .then(lists =>
+                    commit('SET_LISTS', lists.data))
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        GET_MY_LISTS({
+            commit
+        }) {
+            const url = `${baseApiUrl}/lists/mylists`
+
+            axios
+                .get(url)
+                .then(lists =>
+                    commit('SET_LISTS', lists.data))
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        GET_MY_PICKS({
+            commit
+        }) {
+            const url = `${baseApiUrl}/lists/mypicks`
             axios
                 .get(url)
                 .then(lists =>

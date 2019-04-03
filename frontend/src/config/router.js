@@ -21,35 +21,66 @@ const routes = [{
         name: 'home',
         path: '/',
         component: Home
-    },  
+    },
     {
         path: '/admin',
         component: AdminHome,
-        children: [
-            {path: '', component: Dashboard},
-            {path: 'stores', component: StoreAdmin},
+        children: [{
+                path: '',
+                component: Dashboard
+            },
+            {
+                path: 'stores',
+                component: StoreAdmin
+            },
         ]
     },
-    {   name: 'signin',
+    {
+        name: 'signin',
         path: '/signin',
         component: SignIn
     },
-    {   name: 'userEdit',
+    {
+        name: 'userEdit',
         path: '/users/:id/edit',
         component: EditUser
     },
-    {   name: 'userProfile',
+    {
+        name: 'userProfile',
         path: '/users/:id',
         component: UserProfile
     },
     {
         path: '/lists',
         component: List,
-        children: [
-            { path: '', component: Lists },
-            { path: 'new', component: NewList },
-            { path: ':id', component: ListDetails },
-            { path: ':id/edit', component: EditList },
+        children: [{
+                path: '',
+                component: Lists
+            },
+            {
+                path: 'new',
+                component: NewList
+            },
+            {
+                path: 'mylists',
+                component: Lists
+            },
+            {
+                path: 'mypicks',
+                component: Lists
+            },
+            {
+                path: 'history',
+                component: Lists
+            },
+            {
+                path: ':id',
+                component: ListDetails
+            },
+            {
+                path: ':id/edit',
+                component: EditList
+            },
         ]
     },
     {

@@ -367,15 +367,17 @@ module.exports = app => {
         List
             .query(qb => {
                 qb.where({
-                    ownerId: user.id
+                    ownerId: user.id,
+                    confirmed: true
                 })
                 qb.orWhere({
-                    pickerId: user.id
+                    pickerId: user.id,
+                    confirmed: true
                 })
-                qb.havingNotNull('confirmedAt')
-                qb.groupBy('id')
             })
             .fetchPage({
+                withRelated: ['owner', 'picker', 'store'],
+                columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page
             })
@@ -396,6 +398,8 @@ module.exports = app => {
                 })
             })
             .fetchPage({
+                withRelated: ['owner', 'picker', 'store'],
+                columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page
             })
@@ -416,6 +420,8 @@ module.exports = app => {
                 })
             })
             .fetchPage({
+                withRelated: ['owner', 'picker', 'store'],
+                columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page
             })

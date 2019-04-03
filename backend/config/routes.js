@@ -42,6 +42,16 @@ module.exports = app => {
         .get(app.api.list.get)
         .post(app.api.list.save)
 
+    app.route('/lists/mylists')
+        .all(app.config.passport.authenticate())
+        // .get(listOwner(app.api.list.getOwnedByUserId))
+        .get(app.api.list.getOwnedByUserId)
+
+    app.route('/lists/mypicks')
+        .all(app.config.passport.authenticate())
+        // .get(listPicker(app.api.list.getPickedByUserId))
+        .get(app.api.list.getPickedByUserId)
+
     app.route('/lists/:id')
         .all(app.config.passport.authenticate())
         .get(app.api.list.getById)
