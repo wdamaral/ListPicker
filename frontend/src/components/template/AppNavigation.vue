@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<v-toolbar app color="red" dark clipped-left clipped-right>
-			<v-toolbar-side-icon v-if="user.data" @click="drawer = !drawer"></v-toolbar-side-icon>
+			<v-toolbar-side-icon v-if="user.auth" @click="drawer = !drawer"></v-toolbar-side-icon>
 			<v-spacer class="hidden-md-and-up"></v-spacer>
 
 			<img
@@ -21,11 +21,11 @@
 				alt="Grocery List Picker"
 			>
 			<v-spacer class="hidden-sm-and-down"></v-spacer>
-			<v-btn v-if="!user.data" flat class="hidden-sm-and-down" @click="login">SIGN IN</v-btn>
-			<v-btn v-if="user.data" flat @click="logout" class="hidden-sm-and-down">LOGOUT</v-btn>
-			<v-btn v-if="!user.data" color="teal lighten-2" class="hidden-sm-and-down" @click="signup">JOIN</v-btn>
+			<v-btn v-if="!user.auth" flat class="hidden-sm-and-down" @click="login">SIGN IN</v-btn>
+			<v-btn v-if="user.auth" flat @click="logout" class="hidden-sm-and-down">LOGOUT</v-btn>
+			<v-btn v-if="!user.auth" color="teal lighten-2" class="hidden-sm-and-down" @click="signup">JOIN</v-btn>
 		</v-toolbar>
-		<v-navigation-drawer v-if="user.data" v-model="drawer" :mini-variant="mini" dark temporary fixed>
+		<v-navigation-drawer v-if="user.auth" v-model="drawer" :mini-variant="mini" dark temporary fixed>
 			<v-list class="pa-1">
 				<v-list-tile v-if="mini" @click.stop="mini = !mini">
 					<v-list-tile-action>
@@ -34,15 +34,15 @@
 				</v-list-tile>
 
 				<v-list-tile avatar tag="div" @click="viewProfile">
-					<v-list-tile-avatar v-if="user.data.profilePicture">
-						<img :src="baseUrl + user.data.profilePicture">
+					<v-list-tile-avatar v-if="user.auth.profilePicture">
+						<img :src="baseUrl + user.auth.profilePicture">
 					</v-list-tile-avatar>
 					<v-list-tile-avatar v-else>
 						<v-icon size="30" dark>account_circle</v-icon>
 					</v-list-tile-avatar>
 
 					<v-list-tile-content>
-						<v-list-tile-title>{{user.data.firstName}}</v-list-tile-title>
+						<v-list-tile-title>{{user.auth.firstName}}</v-list-tile-title>
 					</v-list-tile-content>
 
 					<v-list-tile-action>
@@ -79,7 +79,7 @@
 				</v-list-tile>
 			</v-list>
 
-			<v-list class="pt-1" subheader>
+			<v-list v-if="user.auth.admin" class="pt-1" subheader>
 				<v-divider light></v-divider>
 
 				<v-subheader>Admin</v-subheader>
@@ -162,7 +162,7 @@ export default {
 			this.$router.push('/login');
 		},
 		viewProfile() {
-			this.$router.push(`/users/${this.user.data.id}`);
+			this.$router.push(`/users/${this.user.auth.id}`);
 		},
 	},
 };

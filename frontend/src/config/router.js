@@ -157,6 +157,7 @@ router.beforeEach((to, from, next) => {
         //         path: '/'
         //     }))
         const user = JSON.parse(loggedIn)
+
         if (user && user.admin) return next()
 
         if (user && user.id == to.params.id) return next()

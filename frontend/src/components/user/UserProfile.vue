@@ -1,6 +1,6 @@
 <template>
 	<div class="user-profile">
-		<v-container>
+		<v-container v-if="user.data">
 			<v-layout row justify-space-between wrap pa-3>
 				<v-flex xs12 md10 offset-md1>
 					<v-card class="card--flex-toolbar">
@@ -97,8 +97,8 @@ export default {
 		]),
 		checkUser() {
 			if (
-				this.user.data.admin ||
-				this.user.data.id === Number(this.$route.params.id)
+				this.user.auth.admin ||
+				this.user.auth.id === Number(this.$route.params.id)
 			) {
 				return true;
 			}
