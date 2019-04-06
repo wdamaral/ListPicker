@@ -1,9 +1,3 @@
-const {
-    authSecret,
-    APP_URL,
-    MG_KEY,
-    MG_BASE
-} = require('.././.env')
 const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
@@ -49,14 +43,14 @@ module.exports = app => {
 
         res.json({
             ...payload,
-            token: jwt.encode(payload, authSecret)
+            token: jwt.encode(payload, process.env.AUTH_KEY)
         })
     }
     const validateToken = async (req, res) => {
         const userData = req.body || null
         try {
             if (userData) {
-                const token = jwt.decode(userData.token, authSecret)
+                const token = jwt.decode(userData.token, process.env.AUTH_KEY)
                 if (new Date(token.exp * 1000) > new Date()) {
                     return res.send(true)
                 }
@@ -73,8 +67,8 @@ module.exports = app => {
     }
     const mgAuth = {
         auth: {
-            api_key: MG_KEY,
-            domain: MG_BASE
+            api_key: process.env.MG_KEY,
+            domain: process.env.MG_BASE
         }
     }
 
@@ -93,7 +87,7 @@ module.exports = app => {
         const emailData = {
             to: user.email,
             subject: 'Grocery List Picker password reset',
-            text: `Please, use the following link for instructions to reset your password: \n\n${APP_URL}reset-password/${token}`
+            text: `Please, use the following link for instructions to reset your password: \n\n${process.env.APP_URL}reset-password/${token}`
         }
         const now = new Date(Date.now() + 1800).toISOString()
 
