@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import axios from 'axios';
 
 import Home from '@/components/home/Home'
+import NotFound from '@/components/template/NotFound'
 import AdminHome from '@/components/admin/AdminHome'
 import Dashboard from '@/components/admin/Dashboard'
 import StoreAdmin from '@/components/admin/store/StoreAdmin'
@@ -29,6 +30,11 @@ const routes = [
         name: 'home',
         path: '/',
         component: Home
+    },
+    {
+        name: '404',
+        path: '/404',
+        component: NotFound
     },
     {
         name: 'forgotPassword',
@@ -70,7 +76,11 @@ const routes = [
     {
         name: 'userEdit',
         path: '/users/:id/edit',
-        component: EditUser
+        component: EditUser,
+        meta: {
+            requiresAdmin: true,
+            requiresOwner: true
+        }
     },
     {
         name: 'userProfile',
@@ -107,8 +117,14 @@ const routes = [
             {
                 path: ':id/edit',
                 component: EditList
-            },
+            }
         ]
+    },
+    {
+        name: 'all',
+        path: '*',
+        redirect: '/404'
+
     }
 ]
 
@@ -118,7 +134,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const publicPages = ['home', 'signin', 'forgotPassword', 'resetPassword', 'login'];
+    const publicPages = ['home', 'signin', 'forgotPassword', 'resetPassword', 'login', 'all'];
     const authRequired = !publicPages.includes(to.name);
 
     const loggedIn = localStorage.getItem(userKey);
@@ -126,7 +142,6 @@ router.beforeEach((to, from, next) => {
     if (authRequired && !loggedIn) {
         return next('/login')
     }
-
     if (to.matched.some(record => record.meta.requiresAdmin)) {
         //implement request => 2nd version
         // const url = `${baseApiUrl}/validate-admin`
@@ -143,8 +158,10 @@ router.beforeEach((to, from, next) => {
         //     }))
         const user = JSON.parse(loggedIn)
         if (user && user.admin) return next()
+
+        if (user && user.id == to.params.id) return next()
         return next({
-            path: '/'
+            path: '/404'
         })
     }
     next()
