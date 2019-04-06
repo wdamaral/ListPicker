@@ -39,8 +39,8 @@ const geocodeAddress = (address) => {
                 throw new Error('Unable to find that address.');
             }
             let objResponse = {
-                latitude: response.data.results[0].geometry.location.lat + getRandomLatitudeOffset(250, 500) ,
-                longitude: response.data.results[0].geometry.location.lng + getRandomLongitudeOffset(250, 500, response.data.results[0].geometry.location.lat)
+                latitude: response.data.results[0].geometry.location.lat + getRandomLatitudeOffset(30, 50) ,
+                longitude: response.data.results[0].geometry.location.lng + getRandomLongitudeOffset(30, 50, response.data.results[0].geometry.location.lat)
             }
             return objResponse
         })

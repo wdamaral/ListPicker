@@ -1,52 +1,144 @@
 module.exports = app => {
-    const { existsOrError, isValidID } = app.api.validation
-    const { ListItem } = app.models.index
+    const {
+        notExistsOrError,
+        existsOrError,
+        equalsOrError,
+        isValidID
+    } = app.api.validation
+    const {
+        ListItem,
+        List
+    } = app.models.index
 
     const save = (req, res) => {
-        const listItems = { ...req.body }
-        if(req.params.id) listItem.id = req.params.id
-
+        const item = {
+            ...req.body
+        }
+        if (req.params.itemId) listItem.id = req.params.itemId
         try {
-            for(let item of listItems) {
-                existsOrError(item.item, 'Item cannot be blank.')
-                existsOrError(item.quantity, 'Quantity cannot be blank.')
-                existsOrError(item.unit, 'Unit cannot be blank.')
-                existsOrError(item.listId, 'List ID not valid')
-            }
-            
-        } catch(msg) {
+            existsOrError(item.item, 'Item name cannot be blank.')
+            existsOrError(item.quantity, 'Quantity cannot be blank.')
+            existsOrError(item.unit, 'Unit cannot be blank.')
+            existsOrError(item.listId, 'List not found.')
+
+        } catch (msg) {
             res.status(400).send(msg)
         }
 
-        if(list.id) {
-            app.db('listItems')
-                .update(listItem)
-                .where({ id: listItem.id })
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
-        } else {
-            app.db('listItems')
-                .insert(listItem)
-                .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
-        }
-    }
-    const remove = async (req, res) => {
-        try {
-            isValidID(req.params.itemId, "ID not valid.")
-            
-            let listId = req.params.id
-            let itemId = req.params.itemId
-            let rowsDeleted = new ListItem({id: itemId, listId}).destroy()
-                try {
-                    notExistsOrError(rowsDeleted.message, 'List not found.')
-                } catch(msg) {
-                    return res.status(400).send(msg)
-                }
+        app.db('listItems')
+            .insert(item)
+            .then(async _ => {
+                let numberOfItems = await ListItem
+                    .where({
+                        listId: item.listId
+                    })
+                    .count('id')
+
+                await List
+                    .where({
+                        id: item.listId
+                    })
+                    .save({
+                        totalItems: numberOfItems
+                    }, {
+                        method: 'update',
+                        patch: true
+                    })
                 return res.status(204).send()
-            } catch(msg) {
-                return res.status(500).send(msg)
+            })
+            .catch(err => {
+                return res.status(500).send(err)
+            })
+
+    }
+    const update = async (req, res) => {
+        const listId = req.params.listId
+        const itemId = req.params.itemId
+
+        const updates = {
+            ...req.body
+        }
+
+        try {
+            let list = await List
+                .where({
+                    id: listId
+                })
+                .fetch()
+
+            equalsOrError(list.get('pickerId'), req.user.id, 'You cannot edit this list.')
+        } catch (msg) {
+            return res.status(403).send(msg)
+        }
+
+        let item
+        try {
+            isValidID(listId, "Item not found for this list.")
+            isValidID(itemId, "Item not found for this list.")
+
+            item = await ListItem
+                .where({
+                    listId: listId,
+                    id: itemId
+                }).fetch()
+
+            existsOrError(item, 'Item not found for this list.')
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+
+        ListItem
+            .where({
+                id: item.id
+            })
+            .save(updates, {
+                method: update,
+                patch: true
+            })
+            .then(_ => res.status(204).send('Success! Item updated.'))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const remove = async (req, res) => {
+        const listId = req.params.listId
+        const itemId = req.params.itemId
+        try {
+            isValidID(listId, "Item not found for this list.")
+            isValidID(itemId, "Item not found for this list.")
+
+            let item = await ListItem.where({
+                listId,
+                id: itemId
+            }).fetch()
+            existsOrError(item, 'Item not found for this list.')
+            // console.log(item)
+
+            let rowsDeleted = await new ListItem(item).destroy()
+            try {
+                notExistsOrError(rowsDeleted.message, 'Item not found for this list.')
+            } catch (msg) {
+                return res.status(400).send(msg)
             }
+            let numberOfItems = await ListItem
+                .where({
+                    listId
+                })
+                .count('id')
+
+            await List
+                .where({
+                    id: listId
+                })
+                .save({
+                    totalItems: numberOfItems
+                }, {
+                    method: 'update',
+                    patch: true
+                })
+            return res.status(204).send('Item removed.')
+        } catch (msg) {
+            return res.status(500).send(msg)
+        }
     }
 
     // const getByListId = (req, res) => {
@@ -67,14 +159,19 @@ module.exports = app => {
 
     const getByListId = (listId) => {
         //const listId = req.params.id
-            return new Promise((resolve, reject) => {
-                return ListItem
-                    .query(qb => qb.where('listId', '=', listId))
-                    .fetchAll()
-                    .then(items => resolve(items))
-                    .catch(err => reject(err))
+        return new Promise((resolve, reject) => {
+            return ListItem
+                .query(qb => qb.where('listId', '=', listId))
+                .fetchAll()
+                .then(items => resolve(items))
+                .catch(err => reject(err))
         })
     }
 
-    return { save, remove, getByListId }
+    return {
+        save,
+        remove,
+        update,
+        getByListId
+    }
 }

@@ -22,20 +22,20 @@ module.exports = app => {
         {
             tableName: 'lists',
             owner: function() {
-                return this.belongsTo(User)
+                return this.belongsTo(User, 'ownerId')
             },
             listItems: function() {
                 return this.hasMany(ListItem, 'listId')
             },
             store: function() {
-                return this.belongsTo(Store)
+                return this.belongsTo(Store, 'storeId')
             },
             picker: function() {
-                return this.belongsTo(User)
+                return this.belongsTo(User, 'pickerId')
             }
         })
     
-    const ListItems = app.bookshelf.Model.extend(
+    const ListItem = app.bookshelf.Model.extend(
         {
             tableName: 'listItems',
             list: function() {
@@ -43,5 +43,5 @@ module.exports = app => {
             }
         })
 
-        return { User, Store, List, ListItems }
+        return { User, Store, List, ListItem }
 }

@@ -11,7 +11,7 @@
             <v-flex xs-12>
                 
             <v-text-field
-                v-model="user.data.firstName"
+                v-model="user.userRegistration.firstName"
                 :counter="50"
                 :rules="nameRules"
                 label="First name"
@@ -20,7 +20,7 @@
             </v-flex>
             <v-flex xs-12>
             <v-text-field
-                v-model="user.data.lastName"
+                v-model="user.userRegistration.lastName"
                 :counter="50"
                 :rules="nameRules"
                 label="Last name"
@@ -33,7 +33,7 @@
             <v-text-field
                 append-icon="email"
                 
-                v-model="user.data.email"
+                v-model="user.userRegistration.email"
                 :rules="emailRules"
                 label="E-mail"
                 required
@@ -43,7 +43,7 @@
             <v-text-field
                 append-icon="phone"
                 mask="phone"
-                v-model="user.data.phoneNumber"
+                v-model="user.userRegistration.phoneNumber"
                 :rules="phoneRules"
                 label="Phone number"
                 required

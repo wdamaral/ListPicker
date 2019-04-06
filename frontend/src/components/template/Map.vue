@@ -1,13 +1,14 @@
 <template>
     <v-card elevation-3>
+        
         <GmapMap 
             ref="mapRef"
-            v-bind:center="{lat: user.data.latitude, lng: user.data.longitude}" 
+            v-bind:center="{lat: latitude, lng: longitude}" 
             style="max-width: 100%; height: 300px;" 
             :zoom="16"
             :radius="10" 
             :options="mapOptions">
-            <gmap-circle :radius="120" :options="mapCenterOptions" v-bind:center="{lat: user.data.latitude, lng: user.data.longitude}"/>
+            <gmap-circle :radius="120" :options="mapCenterOptions" v-bind:center="{lat: latitude, lng: longitude}"/>
         </GmapMap>
     </v-card>
 </template>
@@ -16,6 +17,7 @@
 import {mapState} from 'vuex'
 export default {
     name: 'Map',
+    props: ['latitude', 'longitude'],
     data() {
         return {
             mapCenterOptions: {

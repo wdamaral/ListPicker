@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-import { baseApiUrl } from '@/global'
+import {
+    baseApiUrl
+} from '@/global'
 export default {
     strict: true,
     namespaced: true,
@@ -12,7 +14,7 @@ export default {
         showPreview: false
     },
     mutations: {
-        setStore(state, payload) {
+        SET_STORES(state, payload) {
             state.stores = payload
         },
         resetAll(state) {
@@ -32,80 +34,138 @@ export default {
         getImageUrl(state) {
             return state.fileUrl
         },
-        getStores(state) {
+        GET_STORES(state) {
             return state.stores
+        },
+        GET_SELECTED_STORE_IMAGE: (state) => (payload) => {
+            let store = state.stores.stores.find(store => store.id === payload)
+            return store.imageUrl
+        },
+        GET_PAGINATION(state) {
+            return state.stores.pagination
         }
     },
     actions: {
-        save({commit, state}) {
-            const method = state.data.id ? 'put' : 'post'
-            const id = state.data.id ? `/${state.data.id}` : ''
-            commit('storeLogoPicture')
-            axios[method](`${baseApiUrl}/stores/${id}`, state.data)
-            .then(() => {
-                commit('activeSnackbar', 'Success! Store created.', { root: true })
-                commit('resetAll')
-                //router.push('/')
-            })
-            .catch(err => {
-                let error
-                if(err.response.data) {
-                    error = err.response.data
-                } else {
-                    error = err
-                }
-                
-                commit('activeSnackbar', error, { root: true })
-            })
+        SAVE({
+            commit,
+            dispatch
+        }, store) {
+            const method = store.store.id ? 'put' : 'post'
+            const id = store.store.id ? `/${store.store.id}` : ''
+
+            axios[method](`${baseApiUrl}/stores${id}`, store)
+                .then(() => {
+                    let msg
+                    if (id) {
+                        msg = 'Success! Store updated.'
+                    } else {
+                        msg = 'Success! Store created.'
+                    }
+                    commit('activeSnackbar', msg, {
+                        root: true
+                    })
+                    dispatch('GET_STORES')
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
         },
-        upload({commit}, event) {
-            const url = `${baseApiUrl}/upload`
+        UPLOAD({
+            commit
+        }, event) {
+            const url = `${baseApiUrl}/temp`
             let data = new FormData()
-            let file = event.target.files[0] 
-            if(!file) {
-                return commit('activeSnackbar', 'No files selected', { root: true })
+            let file = event.target.files[0]
+            if (!file) {
+                return commit('activeSnackbar', 'No files selected', {
+                    root: true
+                })
             }
-            
+
             data.append('name', 'my-file')
             data.append('file', file)
-    
+
             let config = {
-                header : {
-                    'Content-Type' : 'multipart/form-data'
+                header: {
+                    'Content-Type': 'multipart/form-data'
                 }
             }
-    
+
             axios.post(url, data, config).then(
                 response => {
-                    commit('fileName', { fileUrl: response.data.filePath, showPreview: true })
-                    commit('activeSnackbar', 'Picture uploaded.', {root: true})
-            }).catch(err => {
+                    commit('activeSnackbar', 'Picture uploaded.', {
+                        root: true
+                    })
+                    return response.data.filePath
+                }).catch(err => {
                 let error
-                if(err.response.data) {
+                if (err.response.data) {
                     error = err.response.data
                 } else {
                     error = err
                 }
-                
-                commit('activeSnackbar', error, { root: true })
+                commit('activeSnackbar', error, {
+                    root: true
+                })
+                return 'fail'
             })
         },
-        loadStores({commit}) {
+        GET_STORES({
+            commit
+        }) {
             const url = `${baseApiUrl}/stores`
 
             axios
                 .get(url)
                 .then(stores =>
-                        commit('setStore', stores.data))
+                    commit('SET_STORES', stores.data))
                 .catch(err => {
                     let error
-                    if(err.response.data) {
+                    if (err.response.data) {
                         error = err.response.data
                     } else {
                         error = err
                     }
-                
-                    commit('activeSnackbar', error, { root: true })
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
+        REMOVE({
+            commit,
+            dispatch
+        }, store) {
+            const url = `${baseApiUrl}/stores/${store.id}`
+
+            axios
+                .delete(url)
+                .then(() => {
+                    commit('activeSnackbar', 'Store removed.', {
+                        root: true
+                    })
+                    dispatch('GET_STORES')
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
                 })
         }
     }

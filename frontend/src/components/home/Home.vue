@@ -1,7 +1,7 @@
 <template>
  <div>
         <home-hero/>
-        <Middle/>
+        <Middle id='easy'/>
         <Bottom/>
         <Contact/>
         <Footer/>
