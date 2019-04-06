@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon",
-    "production": "pm2 start index.js --name backend"
+    "start": "node index.js",
+    "production": "pm2 start index.js --name backend",
+    "watch": "nodemon"
+
   },
   "keywords": [],
   "author": "",
