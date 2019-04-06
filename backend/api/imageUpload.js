@@ -1,6 +1,3 @@
-const {
-  seApi
-} = require('../.env')
 const fs = require('fs')
 //const sightengine = require('sightengine')(seApi.apiUser, seApi.apiSecret)
 const multer = require('multer')
