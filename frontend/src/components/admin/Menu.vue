@@ -32,16 +32,16 @@
 
 <script>
 export default {
-	name: "Menu",
+	name: 'Menu',
 	data() {
 		return {
 			mini: true,
 			items: [
-				{ title: "Dashboard", icon: "dashboard", link: "/admin/" },
-				{ title: "Stores", icon: "store", link: "/admin/stores" }
-			]
+				{ title: 'Dashboard', icon: 'dashboard', link: '/admin/' },
+				{ title: 'Stores', icon: 'store', link: '/admin/stores' },
+			],
 		};
-	}
+	},
 };
 </script>
 

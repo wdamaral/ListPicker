@@ -52,56 +52,56 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { baseProfilePicUrl, baseStoreImgUrl } from "@/global";
-import moment from "moment";
+import { mapState } from 'vuex';
+import { baseProfilePicUrl, baseStoreImgUrl } from '@/global';
+import moment from 'moment';
 export default {
-	name: "List",
+	name: 'List',
 	data() {
 		return {
 			baseUrl: baseProfilePicUrl,
-			baseLogoUrl: baseStoreImgUrl
+			baseLogoUrl: baseStoreImgUrl,
 		};
 	},
 	computed: {
 		...mapState({
-			list: state => state.list
+			list: state => state.list,
 		}),
 		numberOfItems() {
-			return this.$store.getters["list/GET_ITEMS_LENGTH"];
-		}
+			return this.$store.getters['list/GET_ITEMS_LENGTH'];
+		},
 	},
 	filters: {
 		moment: date => {
-			if (date) return moment(date).format("MMMM Do, YYYY");
+			if (date) return moment(date).format('MMMM Do, YYYY');
 
-			return "";
-		}
+			return '';
+		},
 	},
 	created() {
 		this.fetchData();
 	},
 	watch: {
-		$route: "fetchData"
+		$route: 'fetchData',
 	},
 	methods: {
 		fetchData() {
 			switch (this.$route.path) {
-				case "/lists":
-					this.$store.dispatch("list/GET_LISTS");
+				case '/lists':
+					this.$store.dispatch('list/GET_LISTS');
 					break;
-				case "/lists/mylists":
-					this.$store.dispatch("list/GET_MY_LISTS");
+				case '/lists/mylists':
+					this.$store.dispatch('list/GET_MY_LISTS');
 					break;
-				case "/lists/mypicks":
-					this.$store.dispatch("list/GET_MY_PICKS");
+				case '/lists/mypicks':
+					this.$store.dispatch('list/GET_MY_PICKS');
 					break;
 			}
 		},
 		seeDetails(id) {
 			this.$router.push(`/lists/${id}`);
-		}
-	}
+		},
+	},
 };
 </script>
 

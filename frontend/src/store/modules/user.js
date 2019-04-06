@@ -8,6 +8,7 @@ export default {
     namespaced: true,
     state: {
         data: null,
+        auth: null,
         users: [],
         step: 0,
         mode: 'save',
@@ -40,6 +41,9 @@ export default {
         },
         SET_USER(state, payload) {
             state.data = payload
+        },
+        SET_AUTH(state, payload) {
+            state.auth = payload
             if (payload) {
                 axios.defaults.headers.common['Authorization'] = `bearer ${payload.token}`
             } else {
@@ -296,7 +300,7 @@ export default {
             axios
                 .post(url, user)
                 .then(res => {
-                    commit('SET_USER', res.data)
+                    commit('SET_AUTH', res.data)
                     localStorage.setItem(userKey, JSON.stringify(res.data))
                     router.push('/lists')
                 })
@@ -320,7 +324,7 @@ export default {
             commit
         }, router) {
             localStorage.removeItem(userKey)
-            commit('SET_USER', null)
+            commit('SET_AUTH', null)
             router.push({
                 name: 'login'
             })

@@ -6,7 +6,7 @@
 			<v-flex xs12 text-xs-left>
 				<p class="caption">
 					<v-icon small>mdi-road</v-icon>
-					{{address.unit}} {{address.data.street}}
+					{{address.data.street}} # {{address.data.unit}}
 				</p>
 				<p class="caption">{{address.data.postalCode}}</p>
 				<p class="caption">
@@ -27,32 +27,34 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import axios from "axios";
-import { baseApiUrl } from "@/global";
+import { mapState } from 'vuex';
+import axios from 'axios';
+import { baseApiUrl } from '@/global';
 export default {
-	name: "Address",
+	name: 'Address',
 	data() {
 		return {
-			address: {}
+			address: {
+				data: '',
+			},
 		};
 	},
 	computed: {
 		...mapState({
 			user: state => state.user,
-			list: state => state.list
-		})
+			list: state => state.list,
+		}),
 	},
 	methods: {
 		async getAddress() {
 			const url = `${baseApiUrl}/users/address/${this.list.list.id}`;
 
-			this.address = await axios["get"](url);
-		}
+			this.address = await axios['get'](url);
+		},
 	},
 	mounted() {
 		this.getAddress();
-	}
+	},
 };
 </script>
 
