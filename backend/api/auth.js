@@ -1,4 +1,9 @@
-const { authSecret, APP_URL, MG_KEY, MG_BASE } = require('.././.env')
+const {
+    authSecret,
+    APP_URL,
+    MG_KEY,
+    MG_BASE
+} = require('.././.env')
 const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
@@ -8,20 +13,25 @@ var mg = require('nodemailer-mailgun-transport')
 
 module.exports = app => {
 
-    const { existsOrError, equalsOrError } = app.api.validation
-    
+    const {
+        existsOrError,
+        equalsOrError
+    } = app.api.validation
+
     const signin = async (req, res) => {
-        if(!req.body.email || !req.body.password) {
+        if (!req.body.email || !req.body.password) {
             return res.status(400).send('Please, type user and password.')
         }
-    
+
         const user = await app.db('users')
-                    .where({ email: req.body.email })
-                    .first()
-        if(!user) return res.status(400).send('User not found.')
+            .where({
+                email: req.body.email
+            })
+            .first()
+        if (!user) return res.status(400).send('User not found.')
 
         const isMatch = bcrypt.compareSync(req.body.password, user.password)
-            if(!isMatch) return res.status(401).send('Invalid Email / Password.')
+        if (!isMatch) return res.status(401).send('Invalid Email / Password.')
 
         const now = Math.floor(Date.now() / 1000)
 
@@ -45,20 +55,22 @@ module.exports = app => {
     const validateToken = async (req, res) => {
         const userData = req.body || null
         try {
-            if(userData) {
+            if (userData) {
                 const token = jwt.decode(userData.token, authSecret)
-                if(new Date(token.exp * 1000) > new Date()) {
+                if (new Date(token.exp * 1000) > new Date()) {
                     return res.send(true)
                 }
             }
-        } catch(e) {
+        } catch (e) {
             //token problems
         }
 
         res.send(false)
     }
 
-    const defaultEmailData = {from: 'do-not-reply@listpicker.ca'}
+    const defaultEmailData = {
+        from: 'do-not-reply@listpicker.ca'
+    }
     const mgAuth = {
         auth: {
             api_key: MG_KEY,
@@ -67,22 +79,28 @@ module.exports = app => {
     }
 
     const forgotPassword = async (req, res) => {
+        const email = req.body.email
+
         const user = await app.db('users')
-                    .where({ email: req.body.email })
-                    .first()
-        if(!user) return res.status(400).send('User not found.')
-        
+            .where({
+                email
+            })
+            .first()
+        if (!user) return res.status(400).send('User not found.')
+
         const token = crypto.randomBytes(20).toString('hex');
-        
+
         const emailData = {
             to: user.email,
             subject: 'Grocery List Picker password reset',
             text: `Please, use the following link for instructions to reset your password: \n\n${APP_URL}reset-password/${token}`
         }
         const now = new Date(Date.now() + 1800).toISOString()
-        
+
         app.db('users')
-            .where({id: user.id})
+            .where({
+                id: user.id
+            })
             .update({
                 resetPasswordToken: token,
                 resetPasswordExpires: now
@@ -93,14 +111,14 @@ module.exports = app => {
 
                 transporter
                     .sendMail(completeEmailData, (err, info) => {
-                        if(err) {
+                        if (err) {
                             return res.status(500).send(err)
                         }
-                            return res.status(200).json('Email sent successfully.')
-                     })
+                        return res.status(200).send('Email sent successfully.')
+                    })
             })
-        
-        }
+
+    }
 
     const getUserByToken = (token) => {
         return app.db('users')
@@ -123,25 +141,30 @@ module.exports = app => {
             return res.status(400).send(msg)
         }
         const user = await getUserByToken(token)
-        if(!user) return res.status(400).send('User not found')
+        if (!user) return res.status(400).send('User not found')
 
-        if(user.resetPasswordExpires > Date.now()) return res.status(403).send('Token expired.')
+        if (user.resetPasswordExpires > Date.now()) return res.status(403).send('Token expired.')
 
         const password = app.api.user.encryptPassword(req.body.password)
 
         app.db('users')
-            .where({ 
-                id: user.id, 
-                email: user.email, 
-                resetPasswordToken: token 
+            .where({
+                id: user.id,
+                email: user.email,
+                resetPasswordToken: token
             })
             .update({
-                password: password, 
-                resetPasswordToken: null, 
+                password: password,
+                resetPasswordToken: null,
                 resetPasswordExpires: null
             })
             .then(_ => res.status(200).send('Password updated.'))
             .catch(err => res.status(400).send('Fail to update password. Try again.'))
     }
-    return { signin, validateToken, forgotPassword, resetPassword }
+    return {
+        signin,
+        validateToken,
+        forgotPassword,
+        resetPassword
+    }
 }

@@ -93,51 +93,75 @@
 					</v-list-tile-content>
 				</v-list-tile>
 			</v-list>
+			<v-list class="pt-1">
+				<v-divider light></v-divider>
+				<v-list-tile @click="logout">
+					<v-list-tile-action>
+						<v-icon class="white--text">mdi-logout-variant</v-icon>
+					</v-list-tile-action>
+
+					<v-list-tile-content>
+						<v-list-tile-title class="white--text">LOGOUT</v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+			</v-list>
 		</v-navigation-drawer>
 	</div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { baseApiUrl, baseProfilePicUrl } from "@/global";
+import { mapState } from 'vuex';
+import { baseApiUrl, baseProfilePicUrl } from '@/global';
 export default {
-	name: "AppNavigation",
+	name: 'AppNavigation',
 	computed: {
 		...mapState({
-			user: state => state.user
-		})
+			user: state => state.user,
+		}),
 	},
 	data() {
 		return {
-			appTitle: "Grocery List Picker",
+			appTitle: 'Grocery List Picker',
 			baseUrl: baseProfilePicUrl,
 			drawer: false,
 			items: [
-				{ title: "Lists", icon: "list", route: "/lists" },
-				{ title: "My lists", icon: "list_alt", route: "/lists/mylists" },
-				{ title: "My picks", icon: "save_alt", route: "/lists/mypicks" },
-				{ title: "My history", icon: "receipt", route: "/lists/history" }
+				{ title: 'Lists', icon: 'list', route: '/lists' },
+				{
+					title: 'My lists',
+					icon: 'list_alt',
+					route: '/lists/mylists',
+				},
+				{
+					title: 'My picks',
+					icon: 'save_alt',
+					route: '/lists/mypicks',
+				},
+				{
+					title: 'My history',
+					icon: 'receipt',
+					route: '/lists/history',
+				},
 			],
 			itemsAdmin: [
-				{ title: "Dashboard", icon: "dashboard", route: "/admin" },
-				{ title: "Stores", icon: "store", route: "/admin/stores" }
+				{ title: 'Dashboard', icon: 'dashboard', route: '/admin' },
+				{ title: 'Stores', icon: 'store', route: '/admin/stores' },
 			],
 
 			mini: false,
-			right: null
+			right: null,
 		};
 	},
 	methods: {
 		logout() {
-			this.$store.dispatch("user/LOGOUT", this.$router);
+			this.$store.dispatch('user/LOGOUT', this.$router);
 		},
 		signup() {
-			this.$router.push("/signin");
+			this.$router.push('/signin');
 		},
 		login() {
-			this.$router.push("/login");
-		}
-	}
+			this.$router.push('/login');
+		},
+	},
 };
 </script>
 

@@ -3,7 +3,9 @@ import Vuex from 'vuex'
 import user from './modules/user'
 import store from './modules/store'
 import list from './modules/list'
-import { baseApiUrl } from '@/global'
+import {
+    baseApiUrl
+} from '@/global'
 import axios from 'axios'
 
 Vue.use(Vuex)
@@ -24,11 +26,13 @@ export default new Vuex.Store({
         activeSnackbar(state, payload) {
             state.snackText = payload
             state.snackbar = true
-            setTimeout(() => { state.snackbar = false }, state.timeout);
+            setTimeout(() => {
+                state.snackbar = false
+            }, state.timeout);
         },
         hideSnackbar(state) {
             state.snackText = null,
-            state.snackbar = false
+                state.snackbar = false
         }
     },
     actions: {
@@ -58,7 +62,7 @@ export default new Vuex.Store({
                     commit('activeSnackbar', 'Picture uploaded.', {
                         root: true
                     })
-                    
+
                     return response.data.filePath
                 }).catch(err => {
                 let error
