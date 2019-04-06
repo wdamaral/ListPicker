@@ -33,7 +33,7 @@
 					</v-list-tile-action>
 				</v-list-tile>
 
-				<v-list-tile avatar tag="div">
+				<v-list-tile avatar tag="div" @click="viewProfile">
 					<v-list-tile-avatar v-if="user.data.profilePicture">
 						<img :src="baseUrl + user.data.profilePicture">
 					</v-list-tile-avatar>
@@ -160,6 +160,9 @@ export default {
 		},
 		login() {
 			this.$router.push('/login');
+		},
+		viewProfile() {
+			this.$router.push(`/users/${this.user.data.id}`);
 		},
 	},
 };

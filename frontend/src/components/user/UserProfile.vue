@@ -19,6 +19,9 @@
 							</v-avatar>
 							<p class="headline pl-4">Hi, I'm {{user.data.firstName}}</p>
 							<v-spacer/>
+							<v-btn icon v-if="checkUser" class="green lighten-2">
+								<v-icon>mdi-account-edit</v-icon>
+							</v-btn>
 						</v-toolbar>
 
 						<v-card-text>
@@ -57,7 +60,7 @@
 								<v-layout row wrap pa-3 align-content-center>
 									<v-flex xs12>
 										<p class="text-xs-center">
-											<Map v-bind:latitude="user.data.latitude" v-bind:longitude="user.data.longitude"/>
+											<Map :latitude="user.data.latitude" :longitude="user.data.longitude"/>
 										</p>
 									</v-flex>
 								</v-layout>
@@ -92,6 +95,15 @@ export default {
 			'lastDeliveryConfirmed',
 			'activeLists',
 		]),
+		checkUser() {
+			if (
+				this.user.data.admin ||
+				this.user.data.id === Number(this.$route.params.id)
+			) {
+				return true;
+			}
+			return false;
+		},
 	},
 	filters: {
 		moment: date => {

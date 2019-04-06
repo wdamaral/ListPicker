@@ -7,13 +7,20 @@
 					<v-flex>
 						<v-card class="card--flex-toolbar">
 							<v-toolbar card prominent class="green lighten-4 elevation-1">
-								<v-avatar v-if="list.list.owner.profilePicture" class="elevation-3" size="100">
+								<v-avatar
+									v-if="list.list.owner &&  list.list.owner.profilePicture"
+									class="elevation-3"
+									size="100"
+								>
 									<v-img :src="`${pictureApiUrl}${list.list.owner.profilePicture}`"/>
 								</v-avatar>
 								<v-avatar v-else class="green lighten-2 elevation-3" size="100">
 									<v-icon size="60" dark>account_circle</v-icon>
 								</v-avatar>
-								<p class="headline pl-4 elevation">{{list.list.owner.firstName}}'s list</p>
+								<p
+									v-if="list.list.owner"
+									class="headline pl-4 elevation"
+								>{{list.list.owner.firstName}}'s list</p>
 							</v-toolbar>
 							<v-card-text>
 								<h4 class="display-1 py-3">Status</h4>
@@ -66,7 +73,7 @@
 											<v-flex xs12>
 												<v-text-field
 													v-if="(!list.list.receiptNumber || !list.list.isBought) && 
-																	(user.data.id === list.list.pickerId)"
+																	(user.auth.id === list.list.pickerId)"
 													v-model="list.list.receiptNumber"
 													:append-outer-icon="list.list.receiptNumber ? 'mdi-content-save' : 'undefined'"
 													solo
@@ -85,7 +92,7 @@
 													{{ list.list.receiptNumber }}
 												</p>
 											</v-flex>
-											<v-flex v-if="list.list.pickerId === user.data.id" xs12>
+											<v-flex v-if="list.list.pickerId === user.auth.id" xs12>
 												<v-switch
 													v-model="list.list.isBought"
 													v-on:change="setBoughtTime"
@@ -95,7 +102,7 @@
 												></v-switch>
 											</v-flex>
 											<v-flex
-												v-if="list.list.pickerId === user.data.id && list.list.isBought"
+												v-if="list.list.pickerId === user.auth.id && list.list.isBought"
 												xs12
 												text-xs-center
 											>
@@ -108,7 +115,7 @@
 												></v-switch>
 											</v-flex>
 											<v-flex
-												v-if="list.list.ownerId === user.data.id && list.list.isDelivered"
+												v-if="list.list.ownerId === user.auth.id && list.list.isDelivered"
 												xs12
 												text-xs-center
 											>
@@ -139,7 +146,7 @@
 											<v-flex
 												xs8
 												text-xs-right
-												v-if="list.list.ownerId !== user.data.id && !list.list.pickerId"
+												v-if="list.list.ownerId !== user.auth.id && !list.list.pickerId"
 											>
 												<v-btn color="red lighten-2" @click="setPicker" dark round>
 													<v-icon>mdi-hand-okay</v-icon>Pick list
@@ -163,7 +170,7 @@
 														<td class="text-xs-left">{{ props.item.quantity }}</td>
 														<td class="text-xs-left">{{ props.item.unit }}</td>
 														<td class="text-xs-left">{{ props.item.brand }}</td>
-														<td v-if="list.list.pickerId === user.data.id" class="text-xs-left">
+														<td v-if="list.list.pickerId === user.auth.id" class="text-xs-left">
 															<v-icon v-if="!list.list.isBought" @click="editItem(props.item)">edit</v-icon>
 															<v-icon v-if="list.list.isBought">mdi-cash</v-icon>
 															<v-icon v-if="list.list.isDelivered">mdi-truck-delivery</v-icon>
@@ -185,7 +192,7 @@
 																<li
 																	class="flex-item text-xs-left"
 																	data-label="Action"
-																	v-if="list.list.pickerId === user.data.id"
+																	v-if="list.list.pickerId === user.auth.id"
 																>
 																	<v-icon small v-if="!list.list.isBought" @click="editItem(props.item)">edit</v-icon>
 																	<v-icon small v-if="list.list.isBought">mdi-cash</v-icon>
@@ -227,8 +234,8 @@
 										</v-layout>
 									</v-flex>
 								</v-layout>
-								<Address v-if="list.list.pickerId === user.data.id || list.list.ownerId === user.data.id"/>
-								<v-layout row wrap py-4>
+								<Address v-if="list.list.pickerId === user.auth.id || list.list.ownerId === user.auth.id"/>
+								<v-layout v-if="list.list.owner" row wrap py-4>
 									<v-flex>
 										<h4 class="display-1 py-2">Location to deliver</h4>
 										<v-divider class="pb-4"/>
@@ -259,18 +266,18 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
-import { baseStoreImgUrl, baseProfilePicUrl } from "@/global";
-import Map from "@/components/template/Map";
-import EditItemPickerModal from "./EditItemPickerModal";
-import Address from "./Address";
-import moment from "moment";
+import { mapState, mapGetters } from 'vuex';
+import { baseStoreImgUrl, baseProfilePicUrl } from '@/global';
+import Map from '@/components/template/Map';
+import EditItemPickerModal from './EditItemPickerModal';
+import Address from './Address';
+import moment from 'moment';
 export default {
-	name: "ListDetails",
+	name: 'ListDetails',
 	components: { Map, EditItemPickerModal, Address },
 	data() {
 		return {
-			receiptRules: [v => !!v || "Receipt number is required"],
+			receiptRules: [v => !!v || 'Receipt number is required'],
 			isMobile: false,
 			showModal: false,
 			stores: [],
@@ -283,91 +290,111 @@ export default {
 			baseLogoUrl: baseStoreImgUrl,
 			headers: [
 				{
-					text: "#",
-					align: "left",
+					text: '#',
+					align: 'left',
 					sortable: false,
-					value: "id"
+					value: 'id',
 				},
 				{
-					text: "Item name",
-					align: "left",
-					value: "item"
+					text: 'Item name',
+					align: 'left',
+					value: 'item',
 				},
-				{ text: "Quantity", value: "quantity", align: "left" },
-				{ text: "Unit", value: "unit", align: "left" },
-				{ text: "Brand", value: "brand", align: "left" },
-				{ text: "Actions", value: "id", sortable: false, align: "left" }
+				{ text: 'Quantity', value: 'quantity', align: 'left' },
+				{ text: 'Unit', value: 'unit', align: 'left' },
+				{ text: 'Brand', value: 'brand', align: 'left' },
+				{
+					text: 'Actions',
+					value: 'id',
+					sortable: false,
+					align: 'left',
+				},
 			],
-			selectionRules: [v => !!v || "Store is required."]
+			selectionRules: [v => !!v || 'Store is required.'],
 		};
 	},
 	filters: {
 		moment: date => {
-			if (date) return moment(date).format("MMMM Do, YYYY");
+			if (date) return moment(date).format('MMMM Do, YYYY');
 
-			return "Nothing yet.";
-		}
+			return 'Nothing yet.';
+		},
 	},
 	computed: {
 		...mapState({
 			list: state => state.list,
 			store: state => state.store,
-			user: state => state.user
+			user: state => state.user,
 		}),
 		...mapGetters({
-			getMode: "list/GET_MODE",
-			getStores: "store/GET_STORES",
-			getStoreImage: "store/GET_SELECTED_STORE_IMAGE",
-			getItemsSize: "list/GET_ITEMS_LENGTH",
-			getBoughtAt: "list/GET_BOUGHT",
-			getDeliveredAt: "list/GET_DELIVERED",
-			getConfirmedAt: "list/GET_CONFIRMED"
-		})
+			getStoreImage: 'store/GET_SELECTED_STORE_IMAGE',
+			getItemsSize: 'list/GET_ITEMS_LENGTH',
+			getBoughtAt: 'list/GET_BOUGHT',
+			getDeliveredAt: 'list/GET_DELIVERED',
+			getConfirmedAt: 'list/GET_CONFIRMED',
+		}),
 	},
 
 	methods: {
 		pickList() {
-			this.$store.dispatch("list/PICK_LIST");
+			this.$store.dispatch('list/PICK_LIST');
 			this.dialog = false;
 		},
 		async closeDialog(option) {
 			if (option) {
-				if (this.optionButton === "bought") {
+				if (this.optionButton === 'bought') {
 					if (!this.getBoughtAt) {
-						await this.$store.dispatch("list/UPDATE_STATUS", "bought");
-						this.dialog = false;
-					} else {
-						this.$store.commit("showSnackbar", `You can't change it anymore`, {
-							root: true
-						});
-
-						this.$store.commit("list/SET_IS_BOUGHT", false);
-						this.dialog = false;
-					}
-				} else if (this.optionButton === "delivered") {
-					if (!this.getDeliveredAt) {
-						await this.$store.dispatch("list/UPDATE_STATUS", "delivered");
+						await this.$store.dispatch(
+							'list/UPDATE_STATUS',
+							'bought'
+						);
 						this.dialog = false;
 					} else {
 						this.$store.commit(
-							"activeSnackbar",
+							'showSnackbar',
 							`You can't change it anymore`,
 							{
-								root: true
+								root: true,
 							}
 						);
-						this.$store.commit("list/SET_IS_DELIVERED", false);
+
+						this.$store.commit('list/SET_IS_BOUGHT', false);
 						this.dialog = false;
 					}
-				} else if (this.optionButton === "confirmed") {
-					if (!this.getConfirmedAt) {
-						await this.$store.dispatch("list/UPDATE_STATUS", "confirmed");
+				} else if (this.optionButton === 'delivered') {
+					if (!this.getDeliveredAt) {
+						await this.$store.dispatch(
+							'list/UPDATE_STATUS',
+							'delivered'
+						);
 						this.dialog = false;
 					} else {
-						this.$store.commit("showSnackbar", `You can't change it anymore`, {
-							root: true
-						});
-						this.$store.commit("list/SET_IS_CONFIRMED", false);
+						this.$store.commit(
+							'activeSnackbar',
+							`You can't change it anymore`,
+							{
+								root: true,
+							}
+						);
+						this.$store.commit('list/SET_IS_DELIVERED', false);
+						this.dialog = false;
+					}
+				} else if (this.optionButton === 'confirmed') {
+					if (!this.getConfirmedAt) {
+						await this.$store.dispatch(
+							'list/UPDATE_STATUS',
+							'confirmed'
+						);
+						this.dialog = false;
+					} else {
+						this.$store.commit(
+							'showSnackbar',
+							`You can't change it anymore`,
+							{
+								root: true,
+							}
+						);
+						this.$store.commit('list/SET_IS_CONFIRMED', false);
 						this.dialog = false;
 					}
 				} else {
@@ -375,38 +402,38 @@ export default {
 				}
 			} else {
 				switch (this.optionButton) {
-					case "bought":
-						this.$store.commit("list/SET_IS_BOUGHT", false);
+					case 'bought':
+						this.$store.commit('list/SET_IS_BOUGHT', false);
 						break;
-					case "delivered":
-						this.$store.commit("list/SET_IS_DELIVERED", false);
+					case 'delivered':
+						this.$store.commit('list/SET_IS_DELIVERED', false);
 						break;
-					case "confirmed":
-						this.$store.commit("list/SET_IS_CONFIRMED", false);
+					case 'confirmed':
+						this.$store.commit('list/SET_IS_CONFIRMED', false);
 						break;
 				}
 				this.dialog = false;
 			}
 		},
 		setBoughtTime() {
-			this.optionButton = "bought";
+			this.optionButton = 'bought';
 			this.dialog = true;
 		},
 		setPicker() {
-			this.optionButton = "pick";
+			this.optionButton = 'pick';
 			this.dialog = true;
 		},
 		setDeliveredTime() {
-			this.optionButton = "delivered";
+			this.optionButton = 'delivered';
 			this.dialog = true;
 		},
 		setConfirmedTime() {
-			this.optionButton = "confirmed";
+			this.optionButton = 'confirmed';
 			this.dialog = true;
 		},
 		editItem(item) {
-			this.$store.commit("list/SET_EDITED_ITEM", item);
-			this.$store.commit("list/SHOW_MODAL");
+			this.$store.commit('list/SET_EDITED_ITEM', item);
+			this.$store.commit('list/SHOW_MODAL');
 		},
 		onResize() {
 			if (window.innerWidth < 769) this.isMobile = true;
@@ -419,25 +446,25 @@ export default {
 		},
 		async save() {
 			if (this.getItemsSize > 0) {
-				await this.$store.dispatch("list/INSERT", this.$router);
+				await this.$store.dispatch('list/INSERT', this.$router);
 			} else {
 				this.$store.commit(
-					"activeSnackbar",
-					"Please, add items to your list.",
+					'activeSnackbar',
+					'Please, add items to your list.',
 					{
-						root: true
+						root: true,
 					}
 				);
 			}
 		},
-		async saveReceipt() {}
+		async saveReceipt() {},
 	},
-	async mounted() {
-		await this.$store.dispatch("store/GET_STORES");
-		await this.$store.dispatch("list/GET_LIST", this.$route.params.id);
-		this.$store.commit("list/SET_MODE", "UPDATE");
-		this.$store.commit("list/SET_SELECTED_LIST", this.$route.params.id);
-	}
+	created() {
+		this.$store.dispatch('list/GET_LIST', this.$route.params.id);
+		this.$store.dispatch('store/GET_STORES');
+		this.$store.commit('list/SET_MODE', 'UPDATE');
+		this.$store.commit('list/SET_SELECTED_LIST', this.$route.params.id);
+	},
 };
 </script>
 

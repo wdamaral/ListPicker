@@ -84,32 +84,32 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex';
 export default {
-	name: "EditItemPickerModal",
+	name: 'EditItemPickerModal',
 	data() {
 		return {
 			editedItem: {},
-			valid: true
+			valid: true,
 		};
 	},
 	computed: {
 		...mapState({
-			list: state => state.list
-		})
+			list: state => state.list,
+		}),
 	},
 	methods: {
 		closeModal() {
 			this.editedItem = {};
-			this.$store.commit("list/SET_EDITED_ITEM", {});
-			this.$store.commit("list/SHOW_MODAL");
+			this.$store.commit('list/SET_EDITED_ITEM', {});
+			this.$store.commit('list/SHOW_MODAL');
 		},
 		save() {
-			this.$store.dispatch("list/PICKER_UPDATE_LIST");
-			this.$store.commit("list/SET_EDITED_ITEM", {});
-			this.$store.commit("list/SHOW_MODAL");
-		}
-	}
+			this.$store.dispatch('list/PICKER_UPDATE_LIST');
+			this.$store.commit('list/SET_EDITED_ITEM', {});
+			this.$store.commit('list/SHOW_MODAL');
+		},
+	},
 };
 </script>
 

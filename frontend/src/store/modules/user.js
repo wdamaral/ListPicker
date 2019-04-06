@@ -8,6 +8,7 @@ export default {
     namespaced: true,
     state: {
         data: null,
+        auth: null,
         users: [],
         step: 0,
         mode: 'save',
@@ -39,7 +40,7 @@ export default {
             state.userRegistration = state.fileUrl
         },
         SET_USER(state, payload) {
-            state.data = payload
+            state.auth = payload
             if (payload) {
                 axios.defaults.headers.common['Authorization'] = `bearer ${payload.token}`
             } else {
