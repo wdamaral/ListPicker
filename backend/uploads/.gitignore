@@ -2,3 +2,4 @@
 /users/*
 !/users/.gitkeep
 !/stores/.gitkeep
+!/stores/noimage.png
