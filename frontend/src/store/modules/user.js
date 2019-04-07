@@ -52,7 +52,7 @@ export default {
         },
         SET_PROFILE_PICTURE(state, payload) {
             state.userRegistration.profilePicture = payload
-        }
+        },
 
 
     },
@@ -312,6 +312,41 @@ export default {
             router.push({
                 name: 'login'
             })
+        },
+
+        CLOSE_ACCOUNT({
+            commit,
+            state,
+            dispatch
+        }, router) {
+            const id = state.data.id
+            const url = `${baseApiUrl}/users/${id}`
+
+            axios
+                .delete(url)
+                .then(message => {
+                    dispatch('LOGOUT', router)
+                    commit('activeSnackbar', message.data, {
+                        root: true
+                    })
+                })
+                .catch(err => {
+                    let error
+                    if (err.response) {
+                        if (err.response.data) {
+                            error = err.response.data
+                        } else {
+                            error = err.response
+                        }
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+
         }
     }
 }

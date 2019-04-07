@@ -24,6 +24,7 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .put(app.api.user.update)
         .get(app.api.user.getById)
+        .delete(app.api.user.deleteUser)
 
 
     app.route('/stores')

@@ -41,10 +41,22 @@
 							</v-layout>
 							<v-layout row wrap py-3>
 								<v-flex xs12 sm6 px-3>
-									<v-text-field label="First name" v-model="user.data.firstName" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="First name"
+										v-model="user.data.firstName"
+										:disabled="!edit"
+										required
+										:rules="[rules.required, rules.maxLength]"
+									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm6 px-3>
-									<v-text-field label="Last name" v-model="user.data.lastName" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="Last name"
+										v-model="user.data.lastName"
+										:disabled="!edit"
+										required
+										:rules="[rules.required, rules.maxLength]"
+									></v-text-field>
 								</v-flex>
 							</v-layout>
 							<v-layout row wrap py-3>
@@ -54,6 +66,8 @@
 										append-icon="email"
 										v-model="user.data.email"
 										:disabled="!edit"
+										required
+										:rules="[rules.required, rules.email]"
 									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm6 px-3>
@@ -62,6 +76,9 @@
 										append-icon="phone"
 										v-model="user.data.phoneNumber"
 										:disabled="!edit"
+										mask="phone"
+										required
+										:rules="[rules.required, rules.minLengthPhone]"
 									></v-text-field>
 								</v-flex>
 							</v-layout>
@@ -71,12 +88,13 @@
 										label="Password"
 										ref="password"
 										:append-icon="showP ? 'visibility' : 'visibility_off'"
-										:rules="[rules.required, rules.minLength]"
+										:rules="[rules.required, rules.minLengthPass]"
 										:type="showP ? 'text' : 'password'"
 										hint="At least 8 characters"
 										@click:append="showP = !showP"
 										:disabled="!edit"
 										@input="setPassword"
+										required
 									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm6 px-3>
@@ -90,13 +108,20 @@
 										@click:append="showC = !showC"
 										:disabled="!edit"
 										@input="setConfirmPassword"
+										required
 									></v-text-field>
 								</v-flex>
 							</v-layout>
 							<v-divider></v-divider>
 							<v-layout row wrap py-3>
 								<v-flex xs12 sm6 px-3>
-									<v-text-field label="Street" v-model="user.data.street" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="Street"
+										v-model="user.data.street"
+										:disabled="!edit"
+										required
+										:rules="[rules.required, rules.maxLengthAddress]"
+									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm6 px-3>
 									<v-text-field label="Unit #" v-model="user.data.unit" :disabled="!edit"></v-text-field>
@@ -104,13 +129,33 @@
 							</v-layout>
 							<v-layout row wrap py-3>
 								<v-flex xs12 sm4 px-3>
-									<v-text-field label="City" v-model="user.data.city" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="City"
+										v-model="user.data.city"
+										:disabled="!edit"
+										required
+										:rules="[rules.required, rules.maxLength]"
+									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm4 px-3>
-									<v-text-field label="Province" v-model="user.data.province" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="Province"
+										v-model="user.data.province"
+										:disabled="!edit"
+										mask="AA"
+										required
+										:rules="[rules.required, rules.province]"
+									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm4 px-3>
-									<v-text-field label="Postal code" v-model="user.data.postalCode" :disabled="!edit"></v-text-field>
+									<v-text-field
+										label="Postal code"
+										v-model="user.data.postalCode"
+										:disabled="!edit"
+										mask="A#A #A#"
+										required
+										:rules="[rules.required, rules.postalCode]"
+									></v-text-field>
 								</v-flex>
 							</v-layout>
 
@@ -135,7 +180,7 @@
 										<v-btn :disabled="!valid || !edit" color="success" @click="save" class="flex ma-1" round>
 											<v-icon>save</v-icon>Save
 										</v-btn>
-										<v-btn :disabled="!valid" color="red" class="flex ma-1" round dark>
+										<v-btn :disabled="!valid" color="red" @click="dialog = true" class="flex ma-1" round dark>
 											<v-icon>close</v-icon>Close account
 										</v-btn>
 									</p>
@@ -146,6 +191,17 @@
 				</v-flex>
 			</v-layout>
 		</v-container>
+		<v-dialog v-model="dialog" persistent max-width="290">
+			<v-card>
+				<v-card-title class="headline">Are you sure you want to close your account?</v-card-title>
+				<v-card-text>After your confirmation, you will not be able to access to system anymore.</v-card-text>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="green darken-1" flat="flat" @click="closeDialog(false)">Disagree</v-btn>
+					<v-btn color="green darken-1" flat="flat" @click="closeDialog(true)">Agree</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</div>
 </template>
 
@@ -157,22 +213,33 @@ export default {
 	data() {
 		return {
 			valid: true,
+			dialog: false,
 			edit: false,
 			showP: false,
 			showC: false,
 			rules: {
-				required: value => !!value || 'Required field.',
-				minLength: value =>
-					value.length >= 8 ||
+				required: v => !!v || 'Required field.',
+				minLengthPhone: v =>
+					(v && v.length >= 10) || 'Phone number must be 10 digits',
+				minLengthPass: v =>
+					(v && v.length >= 8) ||
 					'Password must contain at least 8 characters',
-				confirmation: value =>
-					value === this.$refs.password.value ||
+				maxLength: v =>
+					(v && v.length <= 50) ||
+					'It must be less than 50 characters',
+				maxLengthAddress: v =>
+					(v && v.length <= 100) ||
+					'It must be less than 100 characters',
+				province: v =>
+					(v && v.length <= 2) || 'Province with only 2 characters',
+				postalCode: v =>
+					(v && /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(v)) ||
+					'Postal code is invalid.',
+				email: v => (v && /.+@.+/.test(v)) || 'E-mail must be valid',
+				confirmation: v =>
+					(v && v === this.$refs.password.value) ||
 					'Password must match.',
 			},
-
-			confirmPasswordRules: [
-				v => !!v || 'Confirmation password is required',
-			],
 		};
 	},
 	computed: {
@@ -207,6 +274,14 @@ export default {
 		},
 		cancelBtn() {
 			this.$router.go(-1);
+		},
+		closeDialog(option) {
+			if (option) {
+				this.$store.dispatch('user/CLOSE_ACCOUNT', this.$router);
+				this.dialog = false;
+			} else {
+				this.dialog = false;
+			}
 		},
 	},
 	mounted() {

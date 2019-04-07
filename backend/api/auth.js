@@ -23,7 +23,7 @@ module.exports = app => {
             })
             .first()
         if (!user) return res.status(400).send('User not found.')
-
+        if (user.deletedAt) return res.status(403).send('User deactivated.')
         const isMatch = bcrypt.compareSync(req.body.password, user.password)
         if (!isMatch) return res.status(401).send('Invalid Email / Password.')
 

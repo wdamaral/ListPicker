@@ -101,7 +101,8 @@ export default {
 				province: v =>
 					(v && v.length <= 2) || 'Province with only 2 characters',
 				postalCode: v =>
-					/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(v),
+					/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(v) ||
+					'Postal code is invalid.',
 			},
 		};
 	},

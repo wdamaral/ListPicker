@@ -267,6 +267,38 @@ module.exports = app => {
         }
     }
 
+    const deleteUser = async (req, res) => {
+        const id = req.params.id || null
+
+        try {
+            isValidID(id, 'ID is invalid.')
+
+            const user = await User
+                .forge({
+                    id
+                })
+                .fetch()
+
+            existsOrError(user, 'User not found.')
+
+            return User
+                .forge({
+                    id: user.id
+                })
+                .save({
+                    deletedAt: new Date(Date.now())
+                }, {
+                    method: 'update',
+                    patch: true
+                })
+                .then(_ => res.status(200).send('User deactivated.'))
+                .catch(err => res.status(500).send(err))
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+    }
+
+
     return {
         insert,
         update,
@@ -274,5 +306,6 @@ module.exports = app => {
         getAddress,
         getById,
         encryptPassword,
+        deleteUser
     }
 }
