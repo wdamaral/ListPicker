@@ -3,10 +3,8 @@ const app = require('express')()
 const consign = require('consign')
 const db = require('./config/db')
 const port = process.env.PORT || 3000
-const cors = require('cors')
 
 app.db = db
-app.use(cors())
 
 consign()
     .include('./config/passport.js')
