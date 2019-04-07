@@ -1,3 +1,4 @@
-*
-*/
-!.gitignore
+/stores/*
+/users/*
+!/users/.gitkeep
+!/stores/.gitkeep
