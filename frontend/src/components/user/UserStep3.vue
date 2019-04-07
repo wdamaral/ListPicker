@@ -21,7 +21,6 @@
 						<v-text-field
 							label="Confirm password"
 							class="ml-3"
-							ref="password"
 							v-model="user.userRegistration.confirmPassword"
 							:append-icon="showC ? 'visibility' : 'visibility_off'"
 							:rules="[rules.required, rules.confirmation]"
