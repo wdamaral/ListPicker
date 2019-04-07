@@ -9,10 +9,10 @@ module.exports = app => {
     app.post('/validateToken', app.api.auth.validateToken)
     app.post('/forgot-password', app.api.auth.forgotPassword)
     app.post('/reset-password/:token', app.api.auth.resetPassword)
+    app.post('/users', app.api.user.insert)
 
     app.route('/users')
         .all(app.config.passport.authenticate())
-        .post(app.api.user.insert)
         .get(admin(app.api.user.get))
     //.get(app.api.user.get)
 
