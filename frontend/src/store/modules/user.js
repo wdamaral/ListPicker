@@ -7,13 +7,11 @@ import {
 export default {
     namespaced: true,
     state: {
-        data: null,
+        data: {},
         auth: null,
         users: [],
         step: 0,
         mode: 'save',
-        fileUrl: '',
-        showPreview: false,
         userRegistration: {}
     },
     mutations: {
@@ -27,17 +25,10 @@ export default {
             state.step = 1
         },
         resetAll(state) {
-            state.data = {}
+            state.userRegistration = {}
             state.step = 0
             state.fileUrl = ''
             state.showPreview = false
-        },
-        fileName(state, payload) {
-            state.fileUrl = payload.fileUrl
-            state.showPreview = payload.showPreview
-        },
-        userProfilePicture(state) {
-            state.userRegistration = state.fileUrl
         },
         SET_USER(state, payload) {
             state.data = payload
@@ -68,9 +59,6 @@ export default {
     getters: {
         step(state) {
             return state.step
-        },
-        imageUrl(state) {
-            return state.fileUrl
         },
 
     },
@@ -112,24 +100,20 @@ export default {
             state
         }, router) {
             const user = {
-                ...state.userRegistration
+                ...state.data
             }
 
-            const method = user.id ? 'put' : 'post'
             const id = user.id ? `${user.id}` : ''
-            if (state.fileUrl !== '') {
-                commit('userProfilePicture')
-                user.profilePicture = state.fileUrl
-            }
+
             delete user.lists
             delete user.listsPick
 
-            axios[method](`${baseApiUrl}/users/${id}`, user)
+            axios.put(`${baseApiUrl}/users/${id}`, user)
                 .then(() => {
                     commit('activeSnackbar', 'Success! User saved.', {
                         root: true
                     })
-                    router.push(`/user/${user.id}`)
+                    router.push(`/users/${user.id}`)
                 })
                 .catch(err => {
                     let error

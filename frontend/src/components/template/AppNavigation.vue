@@ -21,8 +21,13 @@
 				alt="Grocery List Picker"
 			>
 			<v-spacer class="hidden-sm-and-down"></v-spacer>
-			<v-btn v-if="!user.auth" flat class="hidden-sm-and-down" @click="login">SIGN IN</v-btn>
-			<v-btn v-if="user.auth" flat @click="logout" class="hidden-sm-and-down">LOGOUT</v-btn>
+			<v-btn v-if="!user.auth" flat class="hidden-sm-and-down" @click="login">
+				<v-icon>mdi-login-variant</v-icon>SIGN IN
+			</v-btn>
+			<v-btn v-if="user.auth" flat @click="logout" class="hidden-sm-and-down">
+				LOGOUT
+				<v-icon>mdi-logout-variant</v-icon>
+			</v-btn>
 			<v-btn v-if="!user.auth" color="teal lighten-2" class="hidden-sm-and-down" @click="signup">JOIN</v-btn>
 		</v-toolbar>
 		<v-navigation-drawer v-if="user.auth" v-model="drawer" :mini-variant="mini" dark temporary fixed>
@@ -111,7 +116,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { baseApiUrl, baseProfilePicUrl } from '@/global';
+import { baseProfilePicUrl } from '@/global';
 export default {
 	name: 'AppNavigation',
 	computed: {
@@ -125,26 +130,35 @@ export default {
 			baseUrl: baseProfilePicUrl,
 			drawer: false,
 			items: [
-				{ title: 'Lists', icon: 'list', route: '/lists' },
+				{
+					title: 'New list',
+					icon: 'mdi-playlist-plus',
+					route: '/lists/new',
+				},
+				{ title: 'All lists', icon: 'mdi-view-list', route: '/lists' },
 				{
 					title: 'My lists',
-					icon: 'list_alt',
+					icon: 'mdi-format-list-checkbox',
 					route: '/lists/mylists',
 				},
 				{
 					title: 'My picks',
-					icon: 'save_alt',
+					icon: 'mdi-hand-okay',
 					route: '/lists/mypicks',
 				},
 				{
 					title: 'My history',
-					icon: 'receipt',
+					icon: 'mdi-receipt',
 					route: '/lists/history',
 				},
 			],
 			itemsAdmin: [
-				{ title: 'Dashboard', icon: 'dashboard', route: '/admin' },
-				{ title: 'Stores', icon: 'store', route: '/admin/stores' },
+				{
+					title: 'Dashboard',
+					icon: 'mdi-view-dashboard',
+					route: '/admin',
+				},
+				{ title: 'Stores', icon: 'mdi-store', route: '/admin/stores' },
 			],
 
 			mini: false,

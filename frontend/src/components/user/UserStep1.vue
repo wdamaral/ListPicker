@@ -7,7 +7,7 @@
 						<v-text-field
 							v-model="user.userRegistration.firstName"
 							:counter="50"
-							:rules="nameRules"
+							:rules="[rules.required, rules.maxLength]"
 							label="First name"
 							required
 						></v-text-field>
@@ -16,7 +16,7 @@
 						<v-text-field
 							v-model="user.userRegistration.lastName"
 							:counter="50"
-							:rules="nameRules"
+							:rules="[rules.required, rules.maxLength]"
 							label="Last name"
 							required
 						></v-text-field>
@@ -27,7 +27,7 @@
 						<v-text-field
 							append-icon="email"
 							v-model="user.userRegistration.email"
-							:rules="emailRules"
+							:rules="[rules.required, rules.email]"
 							label="E-mail"
 							required
 						></v-text-field>
@@ -37,7 +37,7 @@
 							append-icon="phone"
 							mask="phone"
 							v-model="user.userRegistration.phoneNumber"
-							:rules="phoneRules"
+							:rules="[rules.required, rules.minLength]"
 							label="Phone number"
 							required
 						></v-text-field>
@@ -78,17 +78,15 @@ export default {
 	data() {
 		return {
 			valid: false,
-			nameRules: [
-				v => !!v || 'Name is required',
-				v =>
+			rules: {
+				required: value => !!value || 'Required field.',
+				minLength: v =>
+					(v && v.length >= 10) || 'Phone number must be 10 digits',
+				maxLength: v =>
 					(v && v.length <= 50) ||
 					'Name must be less than 50 characters',
-			],
-			emailRules: [
-				v => !!v || 'E-mail is required',
-				v => /.+@.+/.test(v) || 'E-mail must be valid',
-			],
-			phoneRules: [v => !!v || 'Phone number is required'],
+				email: v => (v && /.+@.+/.test(v)) || 'E-mail must be valid',
+			},
 		};
 	},
 	methods: {

@@ -5,20 +5,20 @@
 				<v-flex>
 					<v-card class="card--flex-toolbar">
 						<v-toolbar card prominent class="green lighten-4 elevation-1">
-							<v-tooltip bottom>
+							<v-avatar v-if="!edit" size="100" color="green lighten-2" class="elevation-4">
+								<v-icon v-if="!user.data.profilePicture" light size="70">account_circle</v-icon>
+								<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
+							</v-avatar>
+							<v-tooltip v-else bottom>
 								<template v-slot:activator="{ on }">
 									<v-avatar
 										size="100"
-										color="grey lighten-4"
+										color="green lighten-2"
 										class="elevation-4"
 										@click="pickFile"
 										v-on="on"
 									>
-										<img
-											v-if="!user.data.profilePicture"
-											:src="require('../../assets/avatar_profile.png')"
-											alt="avatar"
-										>
+										<v-icon v-if="!user.data.profilePicture" light size="70" @click="pickFile">account_circle</v-icon>
 										<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
 									</v-avatar>
 								</template>
@@ -31,12 +31,14 @@
 								accept="image/jpeg, image/jpg image/png, image/gif"
 								@change="upload($event)"
 							>
-							<v-spacer></v-spacer>
-							<v-flex></v-flex>
-							<v-switch color="success" v-model="user.data.admin" label="Admin"></v-switch>
 						</v-toolbar>
 
 						<v-card-text>
+							<v-layout row wrap v-if="user.auth.admin" justify-end>
+								<v-flex xs1 mr-5>
+									<v-switch color="success" :disabled="!edit" v-model="user.data.admin" label="Admin"></v-switch>
+								</v-flex>
+							</v-layout>
 							<v-layout row wrap py-3>
 								<v-flex xs12 sm6 px-3>
 									<v-text-field label="First name" v-model="user.data.firstName" :disabled="!edit"></v-text-field>
@@ -67,8 +69,9 @@
 								<v-flex xs12 sm6 px-3>
 									<v-text-field
 										label="Password"
+										ref="password"
 										:append-icon="showP ? 'visibility' : 'visibility_off'"
-										:rules="passwordRules"
+										:rules="[rules.required, rules.minLength]"
 										:type="showP ? 'text' : 'password'"
 										hint="At least 8 characters"
 										@click:append="showP = !showP"
@@ -79,9 +82,9 @@
 								<v-flex xs12 sm6 px-3>
 									<v-text-field
 										label="Confirm password"
-										ref="password"
+										ref="confirmPassword"
 										:append-icon="showC ? 'visibility' : 'visibility_off'"
-										:rules="confirmPasswordRules"
+										:rules="[rules.required, rules.confirmation]"
 										:type="showC ? 'text' : 'password'"
 										hint="At least 8 characters"
 										@click:append="showC = !showC"
@@ -117,8 +120,17 @@
 							<v-layout row>
 								<v-flex xs12>
 									<p class="text-xs-right">
-										<v-btn :disabled="!valid" color="orange" @click="editBtn" class="flex ma-1" round dark>
+										<v-btn v-if="!edit" color="orange" @click="editBtn" class="flex ma-1" round dark>
 											<v-icon>edit</v-icon>Edit
+										</v-btn>
+										<v-btn
+											v-else
+											color="orange lighten-4 red--text"
+											@click="cancelBtn"
+											class="flex ma-1"
+											round
+										>
+											<v-icon>mdi-cancel</v-icon>Cancel
 										</v-btn>
 										<v-btn :disabled="!valid || !edit" color="success" @click="save" class="flex ma-1" round>
 											<v-icon>save</v-icon>Save
@@ -148,12 +160,16 @@ export default {
 			edit: false,
 			showP: false,
 			showC: false,
-			passwordRules: [
-				v => !!v || 'Password is required',
-				v =>
-					(v && v.length >= 8) ||
-					'Password must have at least 8 characters',
-			],
+			rules: {
+				required: value => !!value || 'Required field.',
+				minLength: value =>
+					value.length >= 8 ||
+					'Password must contain at least 8 characters',
+				confirmation: value =>
+					value === this.$refs.password.value ||
+					'Password must match.',
+			},
+
 			confirmPasswordRules: [
 				v => !!v || 'Confirmation password is required',
 			],
@@ -186,9 +202,15 @@ export default {
 		upload(event) {
 			this.$store.dispatch('user/upload', event);
 		},
+		loadUser() {
+			this.$store.dispatch('user/getUser', this.$route.params.id);
+		},
+		cancelBtn() {
+			this.$router.go(-1);
+		},
 	},
 	mounted() {
-		this.$store.dispatch('user/getUser', this.$route.params.id);
+		this.loadUser();
 	},
 };
 </script>

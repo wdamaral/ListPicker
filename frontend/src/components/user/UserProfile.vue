@@ -5,21 +5,13 @@
 				<v-flex xs12 md10 offset-md1>
 					<v-card class="card--flex-toolbar">
 						<v-toolbar card prominent class="green lighten-4 elevation-1">
-							<v-avatar size="100" color="grey lighten-4" class="elevation-4">
-								<img
-									v-if="!user.data.profilePicture"
-									:src="require('../../assets/avatar_profile.png')"
-									alt="avatar"
-								>
-								<img
-									v-if="user.data.profilePicture"
-									:src="`${imgSrc}${user.data.profilePicture}`"
-									alt="avatar"
-								>
+							<v-avatar size="100" color="green lighten-2" class="elevation-4">
+								<v-icon v-if="!user.data.profilePicture" size="60" dark>account_circle</v-icon>
+								<img v-else :src="`${imgSrc}${user.data.profilePicture}`" alt="avatar">
 							</v-avatar>
 							<p class="headline pl-4">Hi, I'm {{user.data.firstName}}</p>
 							<v-spacer/>
-							<v-btn icon v-if="checkUser" class="green lighten-2">
+							<v-btn icon v-if="checkUser" @click="editUser" class="green lighten-2">
 								<v-icon>mdi-account-edit</v-icon>
 							</v-btn>
 						</v-toolbar>
@@ -114,6 +106,14 @@ export default {
 	},
 	mounted() {
 		this.$store.dispatch('user/getUser', this.$route.params.id);
+	},
+	methods: {
+		editUser() {
+			this.$router.push({
+				name: 'userEdit',
+				params: { id: this.user.data.id },
+			});
+		},
 	},
 };
 </script>

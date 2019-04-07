@@ -8,7 +8,7 @@
 							v-model="user.userRegistration.street"
 							append-icon="home"
 							:counter="100"
-							:rules="streetRules"
+							:rules="[rules.required, rules.maxLength]"
 							label="Street"
 							required
 						></v-text-field>
@@ -22,7 +22,7 @@
 						<v-text-field
 							v-model="user.userRegistration.city"
 							:counter="50"
-							:rules="cityRules"
+							:rules="[rules.required, rules.maxLengthCity]"
 							label="City"
 							required
 						></v-text-field>
@@ -30,16 +30,16 @@
 					<v-flex xs-12>
 						<v-text-field
 							v-model="user.userRegistration.province"
-							:rules="provinceRules"
 							label="Province"
 							mask="AA"
+							:rules="[rules.required, rules.province]"
 							required
 						></v-text-field>
 					</v-flex>
 					<v-flex xs-12>
 						<v-text-field
 							v-model="user.userRegistration.postalCode"
-							:rules="postalRules"
+							:rules="[rules.required, rules.postalCode]"
 							label="Postal Code"
 							mask="A#A #A#"
 							required
@@ -88,26 +88,21 @@ export default {
 	data() {
 		return {
 			valid: false,
-			streetRules: [
-				v => !!v || 'Street is required',
-				v =>
+			rules: {
+				required: value => !!value || 'Required field.',
+				minLength: v =>
+					(v && v.length >= 10) || 'Phone number must be 10 digits',
+				maxLength: v =>
 					(v && v.length <= 100) ||
-					'Street must be less than 100 characters',
-			],
-			cityRules: [
-				v => !!v || 'City is required',
-				v =>
-					(v && v.length <= 100) ||
-					'City must be less than 50 characters',
-			],
-			provinceRules: [
-				v => !!v || 'Province is required',
-				v => (v && v.length <= 2) || 'Province with only 2 characters',
-			],
-			postalRules: [
-				v => !!v || 'Postal code is required',
-				v => /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(v),
-			],
+					'It must be less than 100 characters',
+				maxLengthCity: v =>
+					(v && v.length <= 50) ||
+					'It must be less than 50 characters',
+				province: v =>
+					(v && v.length <= 2) || 'Province with only 2 characters',
+				postalCode: v =>
+					/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(v),
+			},
 		};
 	},
 	methods: {

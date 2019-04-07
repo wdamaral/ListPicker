@@ -6,8 +6,8 @@
 				<v-divider></v-divider>
 				<v-stepper-step :complete="user.step > 2" step="2">Your location</v-stepper-step>
 				<v-divider></v-divider>
-				<v-stepper-step :complete="user.step > 3" step="3">E-mail and password</v-stepper-step>
-				<v-divider></v-divider>
+				<v-stepper-step :complete="user.step > 3" step="3">Password and Picture</v-stepper-step>
+				<v-divider/>
 			</v-stepper-header>
 			<v-stepper-items>
 				<v-stepper-content step="1">
@@ -15,11 +15,11 @@
 				</v-stepper-content>
 
 				<v-stepper-content step="2">
-					<UserStep2/>
+					<UserStep2 v-if="user.step === 2"/>
 				</v-stepper-content>
 
 				<v-stepper-content step="3">
-					<UserStep3/>
+					<UserStep3 v-if="user.step === 3"/>
 				</v-stepper-content>
 			</v-stepper-items>
 		</v-stepper>

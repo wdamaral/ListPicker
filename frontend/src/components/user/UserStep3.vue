@@ -106,12 +106,12 @@ export default {
 			showC: false,
 			tempImgUrl: baseTempImgUrl,
 			rules: {
-				required: value => !!value || 'Required field.',
-				minLength: value =>
-					value.length >= 8 ||
+				required: v => !!v || 'Required field.',
+				minLength: v =>
+					(v && v.length) >= 8 ||
 					'Password must contain at least 8 characters',
-				confirmation: value =>
-					value === this.$refs.password.value ||
+				confirmation: v =>
+					(v && v === this.$refs.password.value) ||
 					'Password must match.',
 				email: v => /.+@.+/.test(v) || 'E-mail must be valid',
 			},

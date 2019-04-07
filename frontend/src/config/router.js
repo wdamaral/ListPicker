@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import axios from 'axios';
 
 import Home from '@/components/home/Home'
 import NotFound from '@/components/template/NotFound'
@@ -18,7 +17,6 @@ import ListDetails from '@/components/list/ListDetails'
 import Login from '@/components/auth/Login'
 import PasswordChange from '@/components/auth/PasswordChange'
 import {
-    baseApiUrl,
     userKey
 } from '@/global'
 
@@ -95,26 +93,32 @@ const routes = [
                 component: Lists
             },
             {
+                name: 'newList',
                 path: 'new',
                 component: NewList
             },
             {
+                name: 'myLists',
                 path: 'mylists',
                 component: Lists
             },
             {
+                name: 'myPicks',
                 path: 'mypicks',
                 component: Lists
             },
             {
+                name: 'history',
                 path: 'history',
                 component: Lists
             },
             {
+                name: 'listDetails',
                 path: ':id',
                 component: ListDetails
             },
             {
+                name: 'listEdit',
                 path: ':id/edit',
                 component: EditList
             }

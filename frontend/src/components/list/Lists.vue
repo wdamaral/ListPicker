@@ -1,5 +1,6 @@
 <template>
-	<v-container grid-list-md>
+	<NoLists v-if="!list.lists.length"/>
+	<v-container v-else grid-list-md>
 		<v-layout row wrap>
 			<v-flex v-for="item in list.lists.lists" :key="item.id" xs12 sm6 lg3>
 				<v-hover>
@@ -55,8 +56,9 @@
 import { mapState } from 'vuex';
 import { baseProfilePicUrl, baseStoreImgUrl } from '@/global';
 import moment from 'moment';
+import NoLists from './NoLists';
 export default {
-	name: 'List',
+	name: 'Lists',
 	data() {
 		return {
 			baseUrl: baseProfilePicUrl,
@@ -102,6 +104,7 @@ export default {
 			this.$router.push(`/lists/${id}`);
 		},
 	},
+	components: { NoLists },
 };
 </script>
 
