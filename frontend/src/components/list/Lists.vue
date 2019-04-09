@@ -1,5 +1,5 @@
 <template>
-	<NoLists v-if="!list.lists.length"/>
+	<NoLists v-if="list.lists.lists.length == 0"/>
 	<v-container v-else grid-list-md>
 		<v-layout row wrap>
 			<v-flex v-for="item in list.lists.lists" :key="item.id" xs12 sm6 lg3>

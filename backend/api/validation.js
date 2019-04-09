@@ -38,6 +38,10 @@ module.exports = app => {
         if (value <= 0) throw msg
     }
 
+    function isGreaterOrError(balance, amount, msg) {
+        if (balance < amount) throw msg
+    }
+
     return {
         existsOrError,
         notExistsOrError,
@@ -45,6 +49,7 @@ module.exports = app => {
         isValidID,
         isNumber,
         isValidPassword,
-        differentOrError
+        differentOrError,
+        isGreaterOrError
     }
 }

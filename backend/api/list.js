@@ -16,7 +16,10 @@ module.exports = app => {
     } = app.models.index
 
     const save = (req, res) => {
-        const user = req.user
+        const user = {
+            ...req.user
+        }
+        console.log(user)
         const list = {
             ...req.body
         }

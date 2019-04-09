@@ -3,191 +3,208 @@
 		<v-container>
 			<v-layout row justify-space-between wrap pa-3>
 				<v-flex>
-					<v-card class="card--flex-toolbar">
-						<v-toolbar card prominent class="green lighten-4 elevation-1">
-							<v-avatar v-if="!edit" size="100" color="green lighten-2" class="elevation-4">
-								<v-icon v-if="!user.data.profilePicture" light size="70">account_circle</v-icon>
-								<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
-							</v-avatar>
-							<v-tooltip v-else bottom>
-								<template v-slot:activator="{ on }">
-									<v-avatar
-										size="100"
-										color="green lighten-2"
-										class="elevation-4"
-										@click="pickFile"
-										v-on="on"
-									>
-										<v-icon v-if="!user.data.profilePicture" light size="70" @click="pickFile">account_circle</v-icon>
-										<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
-									</v-avatar>
-								</template>
-								<span>Upload new picture</span>
-							</v-tooltip>
-							<input
-								type="file"
-								style="display: none"
-								ref="image"
-								accept="image/jpeg, image/jpg image/png, image/gif"
-								@change="upload($event)"
-							>
-						</v-toolbar>
-
-						<v-card-text>
-							<v-layout row wrap v-if="user.auth.admin" justify-end>
-								<v-flex xs1 mr-5>
-									<v-switch color="success" :disabled="!edit" v-model="user.data.admin" label="Admin"></v-switch>
-								</v-flex>
-							</v-layout>
-							<v-layout row wrap py-3>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="First name"
-										v-model="user.data.firstName"
-										:disabled="!edit"
-										required
-										:rules="[rules.required, rules.maxLength]"
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="Last name"
-										v-model="user.data.lastName"
-										:disabled="!edit"
-										required
-										:rules="[rules.required, rules.maxLength]"
-									></v-text-field>
-								</v-flex>
-							</v-layout>
-							<v-layout row wrap py-3>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="E-mail"
-										append-icon="email"
-										v-model="user.data.email"
-										:disabled="!edit"
-										required
-										:rules="[rules.required, rules.email]"
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="Phone number"
-										append-icon="phone"
-										v-model="user.data.phoneNumber"
-										:disabled="!edit"
-										mask="phone"
-										required
-										:rules="[rules.required, rules.minLengthPhone]"
-									></v-text-field>
-								</v-flex>
-							</v-layout>
-							<v-layout row wrap py-3>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="Password"
-										ref="password"
-										:append-icon="showP ? 'visibility' : 'visibility_off'"
-										:rules="[rules.required, rules.minLengthPass]"
-										:type="showP ? 'text' : 'password'"
-										hint="At least 8 characters"
-										@click:append="showP = !showP"
-										:disabled="!edit"
-										@input="setPassword"
-										required
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="Confirm password"
-										ref="confirmPassword"
-										:append-icon="showC ? 'visibility' : 'visibility_off'"
-										:rules="[rules.required, rules.confirmation]"
-										:type="showC ? 'text' : 'password'"
-										hint="At least 8 characters"
-										@click:append="showC = !showC"
-										:disabled="!edit"
-										@input="setConfirmPassword"
-										required
-									></v-text-field>
-								</v-flex>
-							</v-layout>
-							<v-divider></v-divider>
-							<v-layout row wrap py-3>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field
-										label="Street"
-										v-model="user.data.street"
-										:disabled="!edit"
-										required
-										:rules="[rules.required, rules.maxLengthAddress]"
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm6 px-3>
-									<v-text-field label="Unit #" v-model="user.data.unit" :disabled="!edit"></v-text-field>
-								</v-flex>
-							</v-layout>
-							<v-layout row wrap py-3>
-								<v-flex xs12 sm4 px-3>
-									<v-text-field
-										label="City"
-										v-model="user.data.city"
-										:disabled="!edit"
-										required
-										:rules="[rules.required, rules.maxLength]"
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm4 px-3>
-									<v-text-field
-										label="Province"
-										v-model="user.data.province"
-										:disabled="!edit"
-										mask="AA"
-										required
-										:rules="[rules.required, rules.province]"
-									></v-text-field>
-								</v-flex>
-								<v-flex xs12 sm4 px-3>
-									<v-text-field
-										label="Postal code"
-										v-model="user.data.postalCode"
-										:disabled="!edit"
-										mask="A#A #A#"
-										required
-										:rules="[rules.required, rules.postalCode]"
-									></v-text-field>
-								</v-flex>
-							</v-layout>
-
-							<v-divider></v-divider>
-						</v-card-text>
-						<v-card-actions>
-							<v-layout row>
-								<v-flex xs12>
-									<p class="text-xs-right">
-										<v-btn v-if="!edit" color="orange" @click="editBtn" class="flex ma-1" round dark>
-											<v-icon>edit</v-icon>Edit
-										</v-btn>
-										<v-btn
-											v-else
-											color="orange lighten-4 red--text"
-											@click="cancelBtn"
-											class="flex ma-1"
-											round
+					<v-form ref="form" lazy-validation v-model="valid">
+						<v-card class="card--flex-toolbar">
+							<v-toolbar card prominent class="green lighten-4 elevation-1">
+								<v-avatar v-if="!edit" size="100" color="green lighten-2" class="elevation-4">
+									<v-icon v-if="!user.data.profilePicture" light size="70">account_circle</v-icon>
+									<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
+								</v-avatar>
+								<v-tooltip v-else bottom>
+									<template v-slot:activator="{ on }">
+										<v-avatar
+											size="100"
+											color="green lighten-2"
+											class="elevation-4 cursor"
+											@click="pickFile"
+											v-on="on"
 										>
-											<v-icon>mdi-cancel</v-icon>Cancel
-										</v-btn>
-										<v-btn :disabled="!valid || !edit" color="success" @click="save" class="flex ma-1" round>
-											<v-icon>save</v-icon>Save
-										</v-btn>
-										<v-btn :disabled="!valid" color="red" @click="dialog = true" class="flex ma-1" round dark>
-											<v-icon>close</v-icon>Close account
-										</v-btn>
-									</p>
-								</v-flex>
-							</v-layout>
-						</v-card-actions>
-					</v-card>
+											<img v-if="newPicture" :src="tempUrl + newPicture" alt="avatar">
+											<img
+												v-else-if="user.data.profilePicture"
+												:src="profileUrl + user.data.profilePicture"
+												alt="avatar"
+											>
+											<v-icon v-else dark size="70">account_circle</v-icon>
+										</v-avatar>
+									</template>
+									<span>Upload new picture</span>
+								</v-tooltip>
+								<input
+									type="file"
+									style="display: none"
+									ref="image"
+									accept="image/jpeg, image/jpg image/png, image/gif"
+									@change="upload($event)"
+								>
+							</v-toolbar>
+
+							<v-card-text>
+								<v-layout row wrap v-if="user.auth.admin" justify-end>
+									<v-flex xs1 mr-5>
+										<v-switch color="success" :disabled="!edit" v-model="user.data.admin" label="Admin"></v-switch>
+									</v-flex>
+								</v-layout>
+								<v-layout row wrap py-3>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="First name"
+											v-model="user.data.firstName"
+											:disabled="!edit"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.maxLength]"
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="Last name"
+											v-model="user.data.lastName"
+											:disabled="!edit"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.maxLength]"
+										></v-text-field>
+									</v-flex>
+								</v-layout>
+								<v-layout row wrap py-3>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="E-mail"
+											append-icon="email"
+											v-model="user.data.email"
+											:disabled="!edit"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.email]"
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="Phone number"
+											append-icon="phone"
+											v-model="user.data.phoneNumber"
+											:disabled="!edit"
+											mask="phone"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.minLengthPhone]"
+										></v-text-field>
+									</v-flex>
+								</v-layout>
+								<v-layout row wrap py-3>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="Password"
+											ref="password"
+											:append-icon="showP ? 'visibility' : 'visibility_off'"
+											:rules="[rules.required, rules.minLengthPass]"
+											:type="showP ? 'text' : 'password'"
+											hint="At least 8 characters"
+											@click:append="showP = !showP"
+											:disabled="!edit"
+											v-model="password"
+											@input="validateForm"
+											required
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="Confirm password"
+											ref="confirmPassword"
+											:append-icon="showC ? 'visibility' : 'visibility_off'"
+											:rules="[rules.required, rules.confirmation]"
+											:type="showC ? 'text' : 'password'"
+											hint="At least 8 characters"
+											@click:append="showC = !showC"
+											:disabled="!edit"
+											v-model="confirmPassword"
+											validate-on-blur
+											required
+										></v-text-field>
+									</v-flex>
+								</v-layout>
+								<v-divider></v-divider>
+								<v-layout row wrap py-3>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field
+											label="Street"
+											v-model="user.data.street"
+											:disabled="!edit"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.maxLengthAddress]"
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm6 px-3>
+										<v-text-field label="Unit #" v-model="user.data.unit" :disabled="!edit"></v-text-field>
+									</v-flex>
+								</v-layout>
+								<v-layout row wrap py-3>
+									<v-flex xs12 sm4 px-3>
+										<v-text-field
+											label="City"
+											v-model="user.data.city"
+											:disabled="!edit"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.maxLength]"
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm4 px-3>
+										<v-text-field
+											label="Province"
+											v-model="user.data.province"
+											:disabled="!edit"
+											mask="AA"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.province]"
+										></v-text-field>
+									</v-flex>
+									<v-flex xs12 sm4 px-3>
+										<v-text-field
+											label="Postal code"
+											v-model="user.data.postalCode"
+											:disabled="!edit"
+											mask="A#A #A#"
+											required
+											validate-on-blur
+											:rules="[rules.required, rules.postalCode]"
+										></v-text-field>
+									</v-flex>
+								</v-layout>
+
+								<v-divider></v-divider>
+							</v-card-text>
+							<v-card-actions>
+								<v-layout row>
+									<v-flex xs12>
+										<p class="text-xs-right">
+											<v-btn v-if="!edit" color="orange" @click="editBtn" class="flex ma-1" round dark>
+												<v-icon>edit</v-icon>Edit
+											</v-btn>
+											<v-btn
+												v-else
+												color="orange lighten-4 red--text"
+												@click="cancelBtn"
+												class="flex ma-1"
+												round
+											>
+												<v-icon>mdi-cancel</v-icon>Cancel
+											</v-btn>
+											<v-btn :disabled="!valid || !edit" color="success" @click="save" class="flex ma-1" round>
+												<v-icon>save</v-icon>Save
+											</v-btn>
+											<v-btn color="red" @click="dialog = true" class="flex ma-1" round dark>
+												<v-icon>close</v-icon>Close account
+											</v-btn>
+										</p>
+									</v-flex>
+								</v-layout>
+							</v-card-actions>
+						</v-card>
+					</v-form>
 				</v-flex>
 			</v-layout>
 		</v-container>
@@ -207,16 +224,21 @@
 
 <script>
 import { mapState } from 'vuex';
-import { baseApiUrl } from '@/global';
+import { baseTempImgUrl, baseProfilePicUrl } from '@/global';
 export default {
 	name: 'UserProfile',
 	data() {
 		return {
-			valid: true,
+			valid: false,
 			dialog: false,
 			edit: false,
 			showP: false,
 			showC: false,
+			password: null,
+			newPicture: null,
+			confirmPassword: null,
+			tempUrl: baseTempImgUrl,
+			profileUrl: baseProfilePicUrl,
 			rules: {
 				required: v => !!v || 'Required field.',
 				minLengthPhone: v =>
@@ -237,8 +259,7 @@ export default {
 					'Postal code is invalid.',
 				email: v => (v && /.+@.+/.test(v)) || 'E-mail must be valid',
 				confirmation: v =>
-					(v && v === this.$refs.password.value) ||
-					'Password must match.',
+					(v && v === this.password) || 'Password must match.',
 			},
 		};
 	},
@@ -246,11 +267,11 @@ export default {
 		...mapState({
 			user: state => state.user,
 		}),
-		getPath() {
-			return baseApiUrl + '/uploads/users/';
-		},
 	},
 	methods: {
+		validateForm() {
+			this.$refs.form.validate();
+		},
 		setPassword(e) {
 			this.$store.commit('user/SET_PASSWORD', e);
 		},
@@ -264,10 +285,24 @@ export default {
 			this.$refs.image.click();
 		},
 		save() {
+			if (this.password && this.confirmPassword) {
+				this.setPassword(this.password);
+				this.setConfirmPassword(this.confirmPassword);
+			}
+			this.$store.commit(
+				'user/SET_PROFILE_PICTURE_USER_EDIT',
+				this.newPicture
+			);
 			this.$store.dispatch('user/update', this.$router);
 		},
-		upload(event) {
-			this.$store.dispatch('user/upload', event);
+		async upload(event) {
+			let imageUrl = await this.$store.dispatch('UPLOAD', event);
+
+			if (imageUrl) {
+				// this.$store.commit('user/SET_PROFILE_PICTURE', imageUrl);
+				this.newPicture = imageUrl;
+			}
+			this.$forceUpdate();
 		},
 		loadUser() {
 			this.$store.dispatch('user/getUser', this.$route.params.id);
@@ -290,5 +325,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.cursor {
+	cursor: pointer;
+}
 </style>

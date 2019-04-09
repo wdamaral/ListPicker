@@ -9,6 +9,7 @@
 							:counter="50"
 							:rules="[rules.required, rules.maxLength]"
 							label="First name"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -18,6 +19,7 @@
 							:counter="50"
 							:rules="[rules.required, rules.maxLength]"
 							label="Last name"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -29,6 +31,7 @@
 							v-model="user.userRegistration.email"
 							:rules="[rules.required, rules.email]"
 							label="E-mail"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -39,6 +42,7 @@
 							v-model="user.userRegistration.phoneNumber"
 							:rules="[rules.required, rules.minLength]"
 							label="Phone number"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>

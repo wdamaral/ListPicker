@@ -53,6 +53,9 @@ export default {
         SET_PROFILE_PICTURE(state, payload) {
             state.userRegistration.profilePicture = payload
         },
+        SET_PROFILE_PICTURE_USER_EDIT(state, payload) {
+            state.data.profilePicture = payload
+        },
 
 
     },
@@ -60,6 +63,12 @@ export default {
         step(state) {
             return state.step
         },
+        getPassword(state) {
+            return state.data.password
+        },
+        getConfirmPassword(state) {
+            return state.data.confirmPassword
+        }
 
     },
     actions: {
@@ -172,8 +181,11 @@ export default {
         FORGOT_PASSWORD({
             commit
         }, payload) {
-            const email = payload.email
+            const {
+                email
+            } = payload
             const url = `${baseApiUrl}/forgot-password`
+
             axios
                 .post(url, {
                     email

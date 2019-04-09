@@ -84,7 +84,7 @@ export default {
         },
         GET_CONFIRMED(state) {
             return state.list.confirmedAt
-        },
+        }
 
     },
     actions: {
@@ -98,7 +98,7 @@ export default {
                     commit('activeSnackbar', 'Success! List created.', {
                         root: true
                     })
-                    commit('list/SET_LIST', {})
+                    commit('SET_LIST', {})
                     router.push('/lists')
                 })
                 .catch(err => {

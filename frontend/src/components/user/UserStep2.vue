@@ -10,6 +10,7 @@
 							:counter="100"
 							:rules="[rules.required, rules.maxLength]"
 							label="Street"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -24,6 +25,7 @@
 							:counter="50"
 							:rules="[rules.required, rules.maxLengthCity]"
 							label="City"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -33,6 +35,7 @@
 							label="Province"
 							mask="AA"
 							:rules="[rules.required, rules.province]"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>
@@ -42,6 +45,7 @@
 							:rules="[rules.required, rules.postalCode]"
 							label="Postal Code"
 							mask="A#A #A#"
+							validate-on-blur
 							required
 						></v-text-field>
 					</v-flex>

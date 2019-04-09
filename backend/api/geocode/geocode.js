@@ -34,8 +34,9 @@ const geocodeAddress = (address) => {
     return axios
         .get(geocodeUrl)
         .then((response) => {
+            // console.log(response)
             if (response.data.status === 'ZERO_RESULTS') {
-                throw new Error('Unable to find that address.');
+                return
             }
             let objResponse = {
                 latitude: response.data.results[0].geometry.location.lat + getRandomLatitudeOffset(30, 50),

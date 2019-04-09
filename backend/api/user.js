@@ -13,7 +13,8 @@ module.exports = app => {
     } = app.api.validation
     const {
         User,
-        List
+        List,
+        Wallet
     } = app.models.index
     const {
         moveFile
@@ -78,6 +79,8 @@ module.exports = app => {
             if (coordinates.latitude) {
                 user.latitude = coordinates.latitude
                 user.longitude = coordinates.longitude
+            } else {
+                return res.status(400).send('Address is not valid.')
             }
         } catch (err) {
             return res.status(500).send('Fail to connect to Google API.')
@@ -97,7 +100,7 @@ module.exports = app => {
                 })
                 .then(_ => res.status(204).send())
                 .catch(err => {
-                    console.log(err)
+                    // console.log(err)
                     res.status(500).send(err)
                 })
         } else {
@@ -151,10 +154,14 @@ module.exports = app => {
         }
 
         try {
-            let coordinates = await geocodeAddress(`${user.street}, ${user.city}, ${user.province}`)
-            if (coordinates.latitude) {
+            const coordinates = await geocodeAddress(`${user.street}, ${user.city}, ${user.province}`)
+            // console.log(coordinates)
+
+            if (coordinates) {
                 user.latitude = coordinates.latitude
                 user.longitude = coordinates.longitude
+            } else {
+                return res.status(400).send('Address is not valid.')
             }
         } catch (err) {
             return res.status(500).send('Fail to connect to Google API.')
@@ -167,8 +174,16 @@ module.exports = app => {
             app.bookshelf.transaction(t => {
                     let pic = user.profilePicture
                     let saveUser = new User(user).save(null, {
-                        transacting: t
-                    })
+                            transacting: t
+                        })
+                        .tap(user => {
+                            return new Wallet({
+                                    userId: user.id
+                                })
+                                .save(null, {
+                                    transacting: t
+                                })
+                        })
                     let movePic = moveFile(pic, 'users')
                     return Promise.all([saveUser, movePic])
 
@@ -176,11 +191,32 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            User
-                .forge()
-                .save(user)
+            // User
+            //     .forge()
+            //     .save(user)
+            //     .then(_ => res.status(204).send())
+            //     .catch(err => res.status(500).send(err))
+            // console.log(user)
+            app.bookshelf.transaction(t => {
+                    return new User(user)
+                        .save(null, {
+                            transacting: t
+                        })
+                        .tap(user => {
+                            return new Wallet({
+                                    userId: user.id
+                                })
+                                .save(null, {
+                                    transacting: t
+                                })
+                        })
+
+                })
                 .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
+                .catch(err => {
+                    // console.log(err)
+                    return res.status(500).send(err)
+                })
         }
     }
 
@@ -203,9 +239,11 @@ module.exports = app => {
     }
 
     const getById = (req, res) => {
+
         try {
             isValidID(req.params.id, 'ID not valid.')
-            if (req.user.id === req.params.id || req.user.admin) {
+
+            if (req.user.id == req.params.id || req.user.admin) {
                 User
                     .where('id', req.params.id)
                     .fetch({
@@ -239,7 +277,7 @@ module.exports = app => {
 
     const getAddress = async (req, res) => {
         const listId = req.params.listId
-        console.log(listId)
+        // console.log(listId)
 
         try {
             isValidID(listId, 'Invalid list ID')
@@ -262,7 +300,7 @@ module.exports = app => {
             existsOrError(list, 'List not found.')
             return res.status(200).send(list.related('owner'))
         } catch (err) {
-            console.log(err)
+            // console.log(err)
             return res.status(400).send(err)
         }
     }

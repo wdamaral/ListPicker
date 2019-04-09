@@ -112,6 +112,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import AddItemModal from './AddItemModal';
+import { baseStoreImgUrl } from '@/global';
 
 export default {
 	name: 'NewList',
@@ -169,7 +170,7 @@ export default {
 		},
 		getSelectedStore(id) {
 			if (id) {
-				return this.getStoreImage(id);
+				return baseStoreImgUrl + this.getStoreImage(id);
 			}
 		},
 		async save() {

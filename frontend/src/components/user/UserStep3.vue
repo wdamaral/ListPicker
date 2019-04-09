@@ -15,10 +15,13 @@
 							:type="showP ? 'text' : 'password'"
 							hint="At least 8 characters"
 							@click:append="showP = !showP"
+							@input="validateForm"
+							required
 						></v-text-field>
 					</v-flex>
 					<v-flex xs-12>
 						<v-text-field
+							ref="confirmPassword"
 							label="Confirm password"
 							class="ml-3"
 							v-model="user.userRegistration.confirmPassword"
@@ -27,6 +30,8 @@
 							:type="showC ? 'text' : 'password'"
 							hint="At least 8 characters"
 							@click:append="showC = !showC"
+							validate-on-blur
+							required
 						></v-text-field>
 					</v-flex>
 				</v-layout>
@@ -112,6 +117,11 @@ export default {
 				confirmation: v =>
 					(v && v === this.$refs.password.value) ||
 					'Password must match.',
+				password: v =>
+					(v &&
+						this.$refs.confirmPassword.value &&
+						v === this.$refs.confirmPassword.value) ||
+					'Password must match',
 				email: v => /.+@.+/.test(v) || 'E-mail must be valid',
 			},
 		};
@@ -130,6 +140,9 @@ export default {
 			if (this.$refs.form.validate()) {
 				this.$store.commit('user/nextStep');
 			}
+		},
+		validateForm() {
+			this.$refs.form.validate();
 		},
 		reset() {
 			this.$refs.form.reset();

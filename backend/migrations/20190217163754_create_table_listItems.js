@@ -1,9 +1,8 @@
-
-exports.up = function(knex, Promise) {
+exports.up = function (knex, Promise) {
     return knex.schema.createTable('listItems', table => {
         table.increments('id').primary()
         table.string('item').notNull()
-        table.decimal('quantity', [3,2]).notNull()
+        table.decimal('quantity', [13, 2]).notNull()
         table.string('unit', 3).notNull()
         table.string('brand')
         table.string('comments', 120)
@@ -13,6 +12,6 @@ exports.up = function(knex, Promise) {
     })
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function (knex, Promise) {
     return knex.schema.dropTable('listItems')
 };

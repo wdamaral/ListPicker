@@ -74,7 +74,7 @@ module.exports = app => {
 
     const forgotPassword = async (req, res) => {
         const email = req.body.email
-
+        console.log('entrou')
         const user = await app.db('users')
             .where({
                 email
@@ -135,9 +135,9 @@ module.exports = app => {
             return res.status(400).send(msg)
         }
         const user = await getUserByToken(token)
-        if (!user) return res.status(400).send('User not found')
+        if (!user) return res.status(400).send('User not found.')
 
-        if (user.resetPasswordExpires > Date.now()) return res.status(403).send('Token expired.')
+        if (user.resetPasswordExpires > new Date(Date.now())) return res.status(403).send('Token expired. Please, create a new one.')
 
         const password = app.api.user.encryptPassword(req.body.password)
 
@@ -153,7 +153,7 @@ module.exports = app => {
                 resetPasswordExpires: null
             })
             .then(_ => res.status(200).send('Password updated.'))
-            .catch(err => res.status(400).send('Fail to update password. Try again.'))
+            .catch(err => res.status(500).send('Fail to update password. Try again.'))
     }
     return {
         signin,

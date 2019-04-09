@@ -13,10 +13,10 @@ consign()
     .then('./bookshelf.js')
     .then('./models')
     .then('./api')
+    .then('./api/wallet.js')
     .then('./config/routes.js')
     .into(app)
-
 app.listen(port, () => {
-    // console.log(app.models)
+    // console.log(app.api)
     console.log('Backend running...')
 })

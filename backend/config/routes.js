@@ -20,6 +20,19 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .get(app.api.user.getAddress)
 
+    app.route('/users/:id/wallet/deposit')
+        // .all(app.config.passport.authenticate())
+        .post(app.api.transaction.deposit)
+
+    app.route('/users/:id/wallet/withdraw')
+        // .all(app.config.passport.authenticate())
+        .post(app.api.transaction.withdraw)
+
+    app.route('/users/:id/wallet/pay')
+        // .all(app.config.passport.authenticate())
+        .post(app.api.transaction.makePayment)
+
+
     app.route('/users/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.user.update)
@@ -39,7 +52,7 @@ module.exports = app => {
         .delete(admin(app.api.store.remove))
 
     app.route('/lists')
-        //.all(app.config.passport.authenticate())
+        .all(app.config.passport.authenticate())
         .get(app.api.list.get)
         .post(app.api.list.save)
 
