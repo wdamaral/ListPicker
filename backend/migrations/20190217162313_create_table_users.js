@@ -19,7 +19,6 @@ exports.up = function (knex, Promise) {
     table.timestamp('updatedAt')
     table.timestamp('deletedAt')
     table.string('resetPasswordToken')
-    table.string('resetPasswordToken')
     table.timestamp('resetPasswordExpires')
   })
 };
