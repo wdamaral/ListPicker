@@ -28,11 +28,6 @@ module.exports = app => {
         // .all(app.config.passport.authenticate())
         .post(app.api.transaction.withdraw)
 
-    app.route('/users/:id/wallet/pay')
-        // .all(app.config.passport.authenticate())
-        .post(app.api.transaction.makePayment)
-
-
     app.route('/users/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.user.update)
@@ -66,12 +61,6 @@ module.exports = app => {
         // .get(listPicker(app.api.list.getPickedByUserId))
         .get(app.api.list.getPickedByUserId)
 
-    app.route('/lists/:id')
-        .all(app.config.passport.authenticate())
-        .get(app.api.list.getById)
-        .patch(app.api.list.edit)
-        .delete(app.api.list.remove)
-
     app.route('/lists/:id/items')
         .all(app.config.passport.authenticate())
         .get(app.api.listItem.getByListId)
@@ -88,6 +77,13 @@ module.exports = app => {
     app.route('/lists/:id/delivered')
         .all(app.config.passport.authenticate())
         .put(listPicker(app.api.list.deliver))
+
+    app.route('/lists/:id')
+        .all(app.config.passport.authenticate())
+        .get(app.api.list.getById)
+        .patch(app.api.list.edit)
+        .delete(app.api.list.remove)
+        .put(app.api.list.saveReceipt)
 
     app.route('/lists/history/closed')
         .all(app.config.passport.authenticate())

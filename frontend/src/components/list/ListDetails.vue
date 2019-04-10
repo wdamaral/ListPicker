@@ -23,7 +23,18 @@
 								>{{list.list.owner.firstName}}'s list</p>
 							</v-toolbar>
 							<v-card-text>
-								<h4 class="display-1 py-3">Status</h4>
+								<v-layout row justify-space-between>
+									<v-flex xs3>
+										<h4 class="display-1 py-3">Status</h4>
+									</v-flex>
+									<v-flex xs3 md1 text-xs-right align-self-center>
+										<v-img
+											max-width="150px"
+											alt="List delivered and paid."
+											:src="require('@/assets/list_paid.png')"
+										/>
+									</v-flex>
+								</v-layout>
 								<v-divider class="pb-2"/>
 								<v-layout align-center wrap pt-2 row>
 									<v-flex xs12 md6 grow>
@@ -457,7 +468,9 @@ export default {
 				);
 			}
 		},
-		async saveReceipt() {},
+		saveReceipt() {
+			this.$store.dispatch('list/SAVE_RECEIPT');
+		},
 	},
 	created() {
 		this.$store.dispatch('list/GET_LIST', this.$route.params.id);

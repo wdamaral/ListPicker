@@ -22,6 +22,13 @@ module.exports = app => {
 
         try {
             existsOrError(store.name, 'Name cannot be blank')
+
+            const store = Store.forge({
+                name: store.name
+            }).fetch()
+
+            notExistsOrError(store, 'This store is already registered.')
+
         } catch (msg) {
             return res.status(400).send(msg)
         }

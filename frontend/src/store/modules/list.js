@@ -88,14 +88,39 @@ export default {
 
     },
     actions: {
+        SAVE_RECEIPT({
+            commit,
+            state,
+            dispatch
+        }) {
+            const url = `${baseApiUrl}/lists/${state.list.id}`
+            axios.put(url, state.list)
+                .then(message => {
+                    commit('activeSnackbar', message.data, {
+                        root: true
+                    })
+                    dispatch('GET_LIST', state.list.id)
+                })
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
         INSERT({
             commit,
             state
         }, router) {
 
             axios['post'](`${baseApiUrl}/lists`, state.list)
-                .then(() => {
-                    commit('activeSnackbar', 'Success! List created.', {
+                .then(message => {
+                    commit('activeSnackbar', message.data, {
                         root: true
                     })
                     commit('SET_LIST', {})
@@ -120,8 +145,8 @@ export default {
             const id = state.data.id ? `/${state.data.id}` : ''
 
             axios['put'](`${baseApiUrl}/lists/${id}`, state.list)
-                .then(() => {
-                    commit('activeSnackbar', 'Success! List updated.', {
+                .then(message => {
+                    commit('activeSnackbar', message.data, {
                         root: true
                     })
                     router.push('/lists')
@@ -153,8 +178,8 @@ export default {
 
             axios
                 .put(url, editedItem)
-                .then(() => {
-                    commit('activeSnackbar', 'Success! Item updated.', {
+                .then(message => {
+                    commit('activeSnackbar', message.data, {
                         root: true
                     })
                     dispatch('GET_LIST', state.list.id)
@@ -192,8 +217,8 @@ export default {
             }
             axios
                 .put(url, newStatus)
-                .then(() => {
-                    commit('activeSnackbar', 'Success! Status updated.', {
+                .then(message => {
+                    commit('activeSnackbar', message.data, {
                         root: true
                     })
                     dispatch('GET_LIST', state.list.id)
@@ -242,36 +267,6 @@ export default {
                     } else {
                         error = err
                     }
-                    commit('activeSnackbar', error, {
-                        root: true
-                    })
-                })
-        },
-        SAVE_RECEIPT({
-            commit,
-            dispatch,
-            state
-        }) {
-            const url = `${baseApiUrl}/lists/${state.list.id}`
-
-            axios
-                .put(url, state.list.receiptNumber)
-                .then(() => {
-                    dispatch('GET_LIST', state.list.id)
-
-                    commit('activeSnackbar', 'Success! Status updated.', {
-                        root: true
-                    })
-
-                })
-                .catch(err => {
-                    let error
-                    if (err.response.data) {
-                        error = err.response.data
-                    } else {
-                        error = err
-                    }
-
                     commit('activeSnackbar', error, {
                         root: true
                     })

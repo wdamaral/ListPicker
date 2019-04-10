@@ -7,7 +7,8 @@ module.exports = app => {
         notExistsOrError,
         isValidID,
         isNumber,
-        differentOrError
+        differentOrError,
+        equalsOrError
     } = app.api.validation
     const {
         List,
@@ -58,15 +59,54 @@ module.exports = app => {
                         )
                     })
             })
-            .then(_ => res.status(204).send())
+            .then(_ => res.status(200).send('List created successfully.'))
             .catch(err => {
                 // console.log(err)
                 return res.status(500).send(err)
             })
     }
 
+    const saveReceipt = async (req, res) => {
+        const user = {
+            ...req.user
+        }
+
+        const listFromBody = {
+            ...req.body
+        }
+
+        listFromBody.id = req.params.id
+        try {
+
+            const list = await List
+                .forge({
+                    id: listFromBody.id
+                }).fetch()
+
+            equalsOrError(list.get('pickerId'), user.id, 'You cannot edit this list.')
+            existsOrError(list, 'List not found.')
+            return List.forge({
+                    id: list.id
+                }).save({
+                    receiptNumber: listFromBody.receiptNumber
+                }, {
+                    method: 'update'
+                })
+                .then(_ => res.status(200).send('List receipt updated.'))
+                .catch(err => {
+                    console.log(err)
+                    return res.status(500).send(err)
+                })
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+
+    }
+
     const edit = async (req, res) => {
-        const user = req.user
+        const user = {
+            ...req.user
+        }
 
         const list = {
             ...req.body
@@ -165,7 +205,7 @@ module.exports = app => {
                             )
                         })
                 })
-                .then(_ => res.status(204).send())
+                .then(_ => res.status(200).send('List updated succesfully.'))
                 .catch(err => res.status(500).send(err))
         } else {
             if (listFromDb.get('pickerId')) return res.status(403).send('You cannot edit lists that have already been picked.')
@@ -173,39 +213,68 @@ module.exports = app => {
         }
     }
     const confirmDelivery = async (req, res) => {
-        const user = req.user
+        const user = {
+            ...req.user
+        }
         let list
+        let wallet
+        let listItems
+        const {
+            putMoney,
+            removeMoney,
+        } = app.api.wallet
+        const {
+            makePayment
+        } = app.api.transaction
+
         try {
             isValidID(req.params.id, "ID not valid.")
+
             list = await new List({
-                    id: req.params.id,
-                    ownerId: user.id,
-                    isBought: true,
-                    isDelivered: true
-                })
-                .fetch()
+                id: req.params.id,
+                ownerId: user.id,
+                isBought: true,
+                isDelivered: true
+            }).fetch()
+
+
+
             existsOrError(list, 'List cannot be confirmed yet. It might not be delivered.')
 
         } catch (msg) {
             return res.status(400).send(msg)
         }
 
+        return app.bookshelf.transaction(function (t) {
+                const listUpdated = List
+                    .forge({
+                        id: list.id,
+                        ownerId: list.ownerId
+                    })
+                    .save({
+                        isConfirmed: true,
+                        confirmedAt: new Date(Date.now())
+                    }, {
+                        transacting: t
+                    })
 
-        List
-            .forge({
-                id: list.id,
-                ownerId: list.ownerId
+                const takeMoney = removeMoney(list.get('totalCost'), user.id, t)
+                const depositMoney = putMoney(list.get('totalCost'), list.get('pickerId'), t)
+                const transac = makePayment(list.get('pickerId'), user.id, list.get('totalCost'), t)
+
+                return Promise.all([listUpdated, takeMoney, depositMoney, transac])
+            }).then(_ => res.status(200).send('Delivered confirmed and picker paid.'))
+            .catch(err => {
+                console.log(err)
+                return res.status(500).send(err)
             })
-            .save({
-                isConfirmed: true,
-                confirmedAt: new Date(Date.now())
-            })
-            .then(_ => res.status(200).send())
-            .catch(err => res.status(500).send(err))
+
     }
 
     const deliver = async (req, res) => {
-        const user = req.user
+        const user = {
+            ...req.user
+        }
 
         let list
         try {
@@ -244,16 +313,21 @@ module.exports = app => {
                 method: 'update',
                 patch: true
             })
-            .then(_ => res.status(200).send())
+            .then(_ => res.status(200).send('List status updated to Delivered.'))
             .catch(err => res.status(500).send(err))
     }
 
     const markBought = async (req, res) => {
-        const user = req.user
+        const user = {
+            ...req.user
+        }
+        let list
+        let total
         try {
             isValidID(req.params.id, "ID not valid.")
+            // console.log('here')
 
-            const list = await List.forge({
+            list = await List.forge({
                 id: req.params.id,
                 pickerId: user.id,
                 isBought: false
@@ -262,11 +336,12 @@ module.exports = app => {
             })
 
             existsOrError(list, 'You cannot edit the status of this list.')
-
+            total = 0
             try {
                 for (const listItem of list.related('listItems')) {
                     existsOrError(listItem.get('cost'), 'All items must have a price.')
                     existsOrError(listItem.get('qtyBought'), 'All items must have the quantity bought.')
+                    total += listItem.get('qtyBought') * 1
                 }
                 existsOrError(list.get('receiptNumber'), 'Please, update the receipt number first.')
             } catch (msg) {
@@ -274,10 +349,10 @@ module.exports = app => {
             }
 
         } catch (msg) {
-            console.log(msg)
             return res.status(403).send(msg)
         }
 
+        console.log(total)
         List
             .forge({
                 id: list.id,
@@ -285,9 +360,10 @@ module.exports = app => {
             })
             .save({
                 isBought: true,
-                boughtAt: new Date(Date.now())
+                boughtAt: new Date(Date.now()),
+                totalCost: total
             })
-            .then(_ => res.status(200).send())
+            .then(_ => res.status(200).send('List status updated to Items bought.'))
             .catch(err => res.status(500).send(err))
     }
 
@@ -315,7 +391,7 @@ module.exports = app => {
             } catch (msg) {
                 return res.status(400).send(msg)
             }
-            res.status(204).send()
+            res.status(200).send('List removed.')
         } catch (msg) {
             return res.status(500).send(msg)
         }
@@ -488,6 +564,7 @@ module.exports = app => {
         getPickedByUserId,
         getOwnedByUserId,
         markBought,
-        pickList
+        pickList,
+        saveReceipt
     }
 }

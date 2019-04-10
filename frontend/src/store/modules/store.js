@@ -38,8 +38,11 @@ export default {
             return state.stores
         },
         GET_SELECTED_STORE_IMAGE: (state) => (payload) => {
-            let store = state.stores.stores.find(store => store.id === payload)
-            return store.imageUrl
+            if (state.stores.stores) {
+
+                let store = state.stores.stores.find(store => store.id === payload)
+                return store.imageUrl
+            }
         },
         GET_PAGINATION(state) {
             return state.stores.pagination

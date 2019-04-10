@@ -14,66 +14,108 @@ module.exports = app => {
         Transaction
     } = app.models.index
 
-    const makePayment = async (req, res) => {
+    // const makePayment = async (req, res) => {
+    //     const {
+    //         putMoney,
+    //         removeMoney
+    //     } = app.api.wallet
+
+    //     const user = {
+    //         ...req.user
+    //     }
+
+    //     const transac = {
+    //         ...req.body
+    //     }
+    //     try {
+    //         isValidID(transac.fromId, 'User ID is invalid.')
+    //         isValidID(transac.toId, 'User ID is invalid.')
+    //         isNumber(transac.amount, 'Amount is invalid.')
+
+    //         const walletFrom = await Wallet
+    //             .forge({
+    //                 userId: user.id
+    //             })
+    //             .fetch()
+
+    //         existsOrError(walletFrom, 'Wallet not found.')
+    //         isGreaterOrError(walletFrom.balance, transac.amount, 'Balance is not enough to pay.')
+
+    //         const walletTo = await Wallet
+    //             .forge({
+    //                 id: transac.toId
+    //             })
+    //             .fetch()
+
+    //         existsOrError(walletTo, 'Wallet not found.')
+
+    //         return app.bookshelf.transaction(t => {
+    //                 let pay = removeMoney(transac.amount, walletFrom.id)
+    //                 let receive = putMoney(transac.amount, walletTo.id)
+    //                 let transaction = Transaction.forge(transac).save(null, {
+    //                     transaction: t
+    //                 })
+    //                 return Promise.all([pay, receive, transaction])
+    //             })
+    //             .then(_ => res.status(200).send('Payment made successfully.'))
+    //             .catch(err => {
+    //                 console.log(err)
+    //                 return res.status(500).send(err)
+    //             })
+    //     } catch (msg) {
+    //         return res.status(400).send(msg)
+    //     }
+    // }
+
+    const makePayment = async (toId, fromId, amount, t) => {
         const {
             putMoney,
             removeMoney
         } = app.api.wallet
-        // const makePayment = async (from, to, amount) => {
-        // const transac = {
-        //     fromId: from,
-        //     toId: to,
-        //     amount,
-        //     type: 'Payment'
-        // }
-
-        const transac = {
-            ...req.body
-        }
 
         try {
-            isValidID(transac.fromId, 'User ID is invalid.')
-            isValidID(transac.toId, 'User ID is invalid.')
-            isNumber(transac.amount, 'Amount is invalid.')
+            isValidID(fromId, 'User ID is invalid.')
+            isValidID(toId, 'User ID is invalid.')
+            isNumber(amount, 'Amount is invalid.')
 
             const walletFrom = await Wallet
                 .forge({
-                    userId: req.params.id
+                    userId: fromId
                 })
                 .fetch()
 
             existsOrError(walletFrom, 'Wallet not found.')
-            isGreaterOrError(walletFrom.balance, transac.amount, 'Balance is not enough to pay.')
+            isGreaterOrError(walletFrom.balance, amount, 'Balance is not enough to pay.')
 
             const walletTo = await Wallet
                 .forge({
-                    id: transac.toId
+                    userId: toId
                 })
                 .fetch()
 
             existsOrError(walletTo, 'Wallet not found.')
+            const transac = {
+                fromId: walletFrom.get('id'),
+                toId: walletTo.get('id'),
+                amount,
+                type: 'Payment'
+            }
+            return Transaction.forge(transac).save(null, {
+                transacting: t
+            })
 
-            return app.bookshelf.transaction(t => {
-                    let pay = removeMoney(transac.amount, walletFrom.id)
-                    let receive = putMoney(transac.amount, walletTo.id)
-                    let transaction = Transaction.forge(transac).save(null, {
-                        transaction: t
-                    })
-                    return Promise.all([pay, receive, transaction])
-                })
-                .then(_ => res.status(204).send())
-                .catch(err => {
-                    // console.log(err)
-                    return res.status(500).send(err)
-                })
         } catch (msg) {
-            return res.status(400).send(msg)
+            return Promise.reject(msg)
         }
     }
 
     const deposit = async (req, res) => {
-        let transac = {
+        const transac = {
             ...req.body
+        }
+
+        const user = {
+            ...req.user
         }
 
         const {
@@ -86,7 +128,7 @@ module.exports = app => {
 
             const wallet = await Wallet
                 .forge({
-                    userId: req.params.id
+                    userId: user.id
                 })
                 .fetch()
             transac.toId = wallet.id
@@ -105,7 +147,7 @@ module.exports = app => {
                 .catch(err => res.status(500).send(err))
 
         } catch (msg) {
-            console.log(msg)
+            // console.log(msg)
             return res.status(400).send(msg)
         }
     }
@@ -118,6 +160,9 @@ module.exports = app => {
         const transac = {
             ...req.body
         }
+        const user = {
+            ...req.user
+        }
 
         try {
             isValidID(req.params.id, 'User ID is invalid.')
@@ -125,7 +170,7 @@ module.exports = app => {
 
             const wallet = await Wallet
                 .forge({
-                    userId: req.params.id
+                    userId: user.id
                 })
                 .fetch()
             transac.fromId = wallet.id

@@ -13,40 +13,46 @@ module.exports = app => {
         Transaction
     } = app.models.index
 
-    const putMoney = async (amount, id) => {
+    const putMoney = async (amount, id, t) => {
         const wallet = await Wallet
             .forge({
-                id: id
+                userId: id
             })
             .fetch()
         amount += wallet.get('balance') * 1
         return Wallet
             .forge({
-                id
+                id: wallet.get('id')
             })
             .save({
                 balance: amount
             }, {
-                method: 'update'
+                method: 'update',
+                transacting: t
             })
     }
 
-    const removeMoney = async (amount, id) => {
+    const removeMoney = async (amount, id, t) => {
         const wallet = await Wallet
             .forge({
-                id: id
+                userId: id
             })
             .fetch()
-        if (wallet.get('balance') < amount) return Promise.reject('Not enough funds.')
-        amount = wallet.get('balance') - amount
+
+        const newBalance = wallet.get('balance') - amount
+
+        if (newBalance < 0) {
+            return Promise.reject('Balance is not enough to pay.')
+        }
         return Wallet
             .forge({
-                id
+                id: wallet.get('id')
             })
             .save({
                 balance: amount
             }, {
-                method: 'update'
+                method: 'update',
+                transacting: t
             })
     }
 

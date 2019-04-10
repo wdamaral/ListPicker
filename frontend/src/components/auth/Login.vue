@@ -1,6 +1,6 @@
 <template>
-	<v-layout fill-height align-center mx-3>
-		<v-flex xs12 sm6 offset-sm3>
+	<v-layout fill-height justify-center mx-3>
+		<v-flex pa-4 xs10 sm8 md5 align-self-center>
 			<v-card>
 				<v-img
 					class="white--text"
@@ -46,6 +46,13 @@
 						</v-btn>
 					</v-card-actions>
 				</v-form>
+				<v-divider class="pb-3"/>
+				<v-layout py-3 row justify-center>
+					<v-img max-height="50" max-width="50" :src="require('@/assets/or.png')"></v-img>
+				</v-layout>
+				<v-layout pb-3 row justify-center>
+					<v-btn dark color="green lighten-1" @click="signup">Click here to register</v-btn>
+				</v-layout>
 			</v-card>
 		</v-flex>
 	</v-layout>
@@ -71,6 +78,9 @@ export default {
 				user: this.user,
 				router: this.$router,
 			});
+		},
+		signup() {
+			this.$router.push('/signin');
 		},
 	},
 };

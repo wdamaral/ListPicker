@@ -96,7 +96,10 @@ module.exports = app => {
                 patch: true
             })
             .then(_ => res.status(204).send('Success! Item updated.'))
-            .catch(err => res.status(500).send(err))
+            .catch(err => {
+                console.log(err)
+                res.status(500).send(err)
+            })
     }
 
     const remove = async (req, res) => {

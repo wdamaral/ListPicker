@@ -6,6 +6,7 @@ exports.up = function (knex, Promise) {
         table.string('unit', 3).notNull()
         table.string('brand')
         table.string('comments', 120)
+        table.decimal('qtyBought', [13, 2])
         table.decimal('cost', [13, 2])
         table.integer('listId').notNull().references('id')
             .inTable('lists').onDelete('CASCADE')
