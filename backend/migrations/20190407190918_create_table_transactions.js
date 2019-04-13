@@ -2,7 +2,7 @@ exports.up = function (knex, Promise) {
     return knex.schema.createTable('transactions', table => {
         table.increments('id').primary()
         table.string('type').notNull()
-        table.integer('fromId').notNull().references('id')
+        table.integer('fromId').references('id')
             .inTable('wallets')
         table.integer('toId').references('id')
             .inTable('wallets')

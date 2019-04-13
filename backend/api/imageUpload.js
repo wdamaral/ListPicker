@@ -56,7 +56,6 @@ module.exports = app => {
 
       fs.rename(oldPath, newPath, function (err) {
         if (err) {
-          console.log(err)
           reject('Oops... Something went wrong.')
         }
         resolve()

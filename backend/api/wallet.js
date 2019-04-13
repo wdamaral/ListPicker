@@ -1,16 +1,6 @@
 module.exports = app => {
     const {
-        existsOrError,
-        notExistsOrError,
-        equalsOrError,
-        isValidID,
-        isValidPassword
-    } = app.api.validation
-
-    const {
-        User,
         Wallet,
-        Transaction
     } = app.models.index
 
     const putMoney = async (amount, id, t) => {
@@ -19,16 +9,28 @@ module.exports = app => {
                 userId: id
             })
             .fetch()
-        amount += wallet.get('balance') * 1
+        const newBalance = (wallet.get('balance') * 1) + amount * 1
+
+        if (t) {
+            return Wallet
+                .forge({
+                    id: wallet.get('id')
+                })
+                .save({
+                    balance: newBalance
+                }, {
+                    method: 'update',
+                    transacting: t
+                })
+        }
         return Wallet
             .forge({
                 id: wallet.get('id')
             })
             .save({
-                balance: amount
+                balance: newBalance
             }, {
-                method: 'update',
-                transacting: t
+                method: 'update'
             })
     }
 
@@ -39,20 +41,33 @@ module.exports = app => {
             })
             .fetch()
 
-        const newBalance = wallet.get('balance') - amount
+        const newBalance = (wallet.get('balance') * 1) - amount
 
         if (newBalance < 0) {
             return Promise.reject('Balance is not enough to pay.')
         }
+        if (t) {
+
+            return Wallet
+                .forge({
+                    id: wallet.get('id')
+                })
+                .save({
+                    balance: newBalance
+                }, {
+                    method: 'update',
+                    transacting: t
+                })
+        }
+
         return Wallet
             .forge({
                 id: wallet.get('id')
             })
             .save({
-                balance: amount
+                balance: newBalance
             }, {
-                method: 'update',
-                transacting: t
+                method: 'update'
             })
     }
 
@@ -65,12 +80,13 @@ module.exports = app => {
                 userId: user.id
             })
             .fetch()
-            .then(_ => res.status(200).send())
+            .then(wallet => res.status(200).send(wallet))
             .catch(err => res.status(500).send(err))
     }
 
     return {
         putMoney,
-        removeMoney
+        removeMoney,
+        getByUserId
     }
 }

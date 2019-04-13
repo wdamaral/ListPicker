@@ -16,6 +16,9 @@ import Lists from '@/components/list/Lists'
 import ListDetails from '@/components/list/ListDetails'
 import Login from '@/components/auth/Login'
 import PasswordChange from '@/components/auth/PasswordChange'
+import WalletHome from '@/components/wallet/WalletHome'
+import UserHome from '@/components/user/UserHome'
+
 import {
     userKey
 } from '@/global'
@@ -72,18 +75,28 @@ const routes = [
         ]
     },
     {
-        name: 'userEdit',
-        path: '/users/:id/edit',
-        component: EditUser,
-        meta: {
-            requiresAdmin: true,
-            requiresOwner: true
-        }
-    },
-    {
-        name: 'userProfile',
         path: '/users/:id',
-        component: UserProfile
+        component: UserHome,
+        children: [{
+                name: 'userProfile',
+                path: '',
+                component: UserProfile
+            },
+            {
+                name: 'userEdit',
+                path: 'edit',
+                component: EditUser,
+                meta: {
+                    requiresAdmin: true,
+                    requiresOwner: true
+                }
+            },
+            {
+                name: 'wallet',
+                path: 'wallet',
+                component: WalletHome,
+            },
+        ]
     },
     {
         path: '/lists',

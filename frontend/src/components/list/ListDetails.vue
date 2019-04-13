@@ -27,7 +27,7 @@
 									<v-flex xs3>
 										<h4 class="display-1 py-3">Status</h4>
 									</v-flex>
-									<v-flex xs3 md1 text-xs-right align-self-center>
+									<v-flex v-if="list.list.isConfirmed" xs3 md1 text-xs-right align-self-center>
 										<v-img
 											max-width="150px"
 											alt="List delivered and paid."

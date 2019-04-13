@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import user from './modules/user'
 import store from './modules/store'
 import list from './modules/list'
+import wallet from './modules/wallet'
 import {
     baseApiUrl
 } from '@/global'
@@ -14,7 +15,8 @@ export default new Vuex.Store({
     modules: {
         user,
         store,
-        list
+        list,
+        wallet
     },
     state: {
         isMenuVisible: true,

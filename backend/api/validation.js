@@ -39,7 +39,7 @@ module.exports = app => {
     }
 
     function isGreaterOrError(balance, amount, msg) {
-        if (balance < amount) throw msg
+        if (balance * 1 < amount * 1) throw msg
     }
 
     return {

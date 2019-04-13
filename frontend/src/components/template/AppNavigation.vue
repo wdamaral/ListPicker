@@ -57,7 +57,7 @@
 					</v-list-tile-action>
 				</v-list-tile>
 			</v-list>
-			<v-list class="pt-1">
+			<v-list class="pt-0">
 				<v-divider light></v-divider>
 				<v-list-tile route to="/">
 					<v-list-tile-action>
@@ -70,6 +70,18 @@
 				</v-list-tile>
 			</v-list>
 
+			<v-list class="pt-0">
+				<v-divider light></v-divider>
+				<v-list-tile route :to="'/users/'+user.auth.id +'/wallet'">
+					<v-list-tile-action>
+						<v-icon class="white--text">mdi-wallet</v-icon>
+					</v-list-tile-action>
+
+					<v-list-tile-content>
+						<v-list-tile-title class="white--text">My wallet</v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+			</v-list>
 			<v-list class="pt-0" subheader>
 				<v-subheader>Grocery lists</v-subheader>
 				<v-divider light></v-divider>

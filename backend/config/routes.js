@@ -21,12 +21,20 @@ module.exports = app => {
         .get(app.api.user.getAddress)
 
     app.route('/users/:id/wallet/deposit')
-        // .all(app.config.passport.authenticate())
+        .all(app.config.passport.authenticate())
         .post(app.api.transaction.deposit)
 
     app.route('/users/:id/wallet/withdraw')
-        // .all(app.config.passport.authenticate())
+        .all(app.config.passport.authenticate())
         .post(app.api.transaction.withdraw)
+
+    app.route('/users/:id/wallet/transactions')
+        .all(app.config.passport.authenticate())
+        .get(app.api.transaction.getByUserId)
+
+    app.route('/users/:id/wallet')
+        .all(app.config.passport.authenticate())
+        .get(app.api.wallet.getByUserId)
 
     app.route('/users/:id')
         .all(app.config.passport.authenticate())

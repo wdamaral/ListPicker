@@ -45,7 +45,7 @@ module.exports = app => {
     const Wallet = app.bookshelf.Model.extend({
         tableName: 'wallets',
         user: function () {
-            return this.belongsTo(User)
+            return this.belongsTo(User, 'userId')
         },
         transac_from: function () {
             return this.belongsToMany(Transaction, 'fromId')

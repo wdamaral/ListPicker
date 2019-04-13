@@ -12,7 +12,7 @@ module.exports = app => {
         moveFile
     } = app.api.imageUpload
 
-    const insert = (req, res) => {
+    const insert = async (req, res) => {
         const store = {
             ...req.body.store
         }
@@ -23,11 +23,11 @@ module.exports = app => {
         try {
             existsOrError(store.name, 'Name cannot be blank')
 
-            const store = Store.forge({
+            const storeFromDb = await Store.forge({
                 name: store.name
             }).fetch()
 
-            notExistsOrError(store, 'This store is already registered.')
+            notExistsOrError(storeFromDb, 'This store is already registered.')
 
         } catch (msg) {
             return res.status(400).send(msg)
@@ -53,7 +53,11 @@ module.exports = app => {
                 .forge()
                 .save(store)
                 .then(_ => res.status(204).send())
-                .catch(err => res.status(500).send(err))
+                .catch(err => {
+
+                    console.log(err)
+                    res.status(500).send(err)
+                })
         }
 
     }
