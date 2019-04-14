@@ -123,7 +123,7 @@ export default {
 		},
 		getMain() {
 			if (this.$route.name === 'myPicks') {
-				return 'My Picks';
+				return 'My List Picking';
 			} else if (this.$route.name === 'myLists') {
 				return 'My Lists';
 			} else if (this.$route.name === 'history') {

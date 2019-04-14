@@ -16,17 +16,18 @@
 										v-model="list.editedItem.item"
 										counter="30"
 										maxlength="30"
-										:rules="nameRules"
+										:rules="[rules.required]"
 										required
 									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm3>
 									<v-text-field
 										type="number"
+										min="0"
 										label="Quantity *"
 										v-model="list.editedItem.quantity"
 										hint="How much do you want?"
-										v-bind:rules="quantityRules"
+										:rules="[rules.required, rules.positive]"
 										required
 									></v-text-field>
 								</v-flex>
@@ -36,7 +37,7 @@
 										label="Unit *"
 										hint="Kilo? Pound? Case? Each?"
 										v-model="list.editedItem.unit"
-										v-bind:rules="unitRules"
+										:rules="[rules.required]"
 										required
 									></v-select>
 								</v-flex>
@@ -48,7 +49,7 @@
 										required
 										counter="30"
 										maxlength="30"
-										v-bind:rules="brandRules"
+										:rules="[rules.required]"
 									></v-text-field>
 								</v-flex>
 								<v-flex xs12>
@@ -83,10 +84,10 @@ export default {
 	data() {
 		return {
 			valid: true,
-			nameRules: [v => !!v || 'Item name is required'],
-			quantityRules: [v => !!v || 'Quantity is required'],
-			unitRules: [v => !!v || 'Unit is required'],
-			brandRules: [v => !!v || 'Brand is required'],
+			rules: {
+				required: v => !!v || 'Field required.',
+				positive: v => (v && v > 0) || 'Number must be greater than 0.',
+			},
 		};
 	},
 	computed: {

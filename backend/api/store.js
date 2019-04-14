@@ -44,7 +44,7 @@ module.exports = app => {
                 })
                 .then(_ => res.status(204).send())
                 .catch(err => {
-                    console.log(err)
+                    // console.log(err)
                     return res.status(500).send(err)
                 })
         } else {
@@ -55,7 +55,7 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => {
 
-                    console.log(err)
+                    // console.log(err)
                     res.status(500).send(err)
                 })
         }
@@ -96,7 +96,7 @@ module.exports = app => {
                     })
                     .then(_ => res.status(204).send())
                     .catch(err => {
-                        console.log(err)
+                        // console.log(err)
                         return res.status(500).send(err)
                     })
 

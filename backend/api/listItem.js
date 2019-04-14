@@ -3,7 +3,8 @@ module.exports = app => {
         notExistsOrError,
         existsOrError,
         equalsOrError,
-        isValidID
+        isValidID,
+        isNumber
     } = app.api.validation
     const {
         ListItem,
@@ -58,6 +59,7 @@ module.exports = app => {
         const updates = {
             ...req.body
         }
+        // console.log(updates)
 
         try {
             let list = await List
@@ -73,6 +75,7 @@ module.exports = app => {
 
         let item
         try {
+            isNumber(updates.cost, 'Item cost is invalid.')
             isValidID(listId, "Item not found for this list.")
             isValidID(itemId, "Item not found for this list.")
 
@@ -81,13 +84,13 @@ module.exports = app => {
                     listId: listId,
                     id: itemId
                 }).fetch()
-
             existsOrError(item, 'Item not found for this list.')
         } catch (msg) {
+            // console.log(msg)
             return res.status(400).send(msg)
         }
 
-        ListItem
+        return ListItem
             .where({
                 id: item.id
             })
@@ -95,9 +98,9 @@ module.exports = app => {
                 method: update,
                 patch: true
             })
-            .then(_ => res.status(204).send('Success! Item updated.'))
+            .then(_ => res.status(200).send('Success! Item updated.'))
             .catch(err => {
-                console.log(err)
+                // console.log(err)
                 res.status(500).send(err)
             })
     }

@@ -154,7 +154,7 @@ export default {
 					route: '/lists/mylists',
 				},
 				{
-					title: 'My picks',
+					title: 'My list picking',
 					icon: 'mdi-hand-okay',
 					route: '/lists/mypicks',
 				},

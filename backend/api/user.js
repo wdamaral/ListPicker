@@ -191,12 +191,7 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
-            // User
-            //     .forge()
-            //     .save(user)
-            //     .then(_ => res.status(204).send())
-            //     .catch(err => res.status(500).send(err))
-            // console.log(user)
+
             app.bookshelf.transaction(t => {
                     return new User(user)
                         .save(null, {

@@ -20,7 +20,7 @@ module.exports = app => {
         const user = {
             ...req.user
         }
-        console.log(user)
+        // console.log(user)
         const list = {
             ...req.body
         }
@@ -94,7 +94,7 @@ module.exports = app => {
                 })
                 .then(_ => res.status(200).send('List receipt updated.'))
                 .catch(err => {
-                    console.log(err)
+                    // console.log(err)
                     return res.status(500).send(err)
                 })
         } catch (msg) {
@@ -216,9 +216,10 @@ module.exports = app => {
         const user = {
             ...req.user
         }
+        const SITE_COST = 5
+
         let list
-        let wallet
-        let listItems
+
         const {
             putMoney,
             removeMoney,
@@ -257,15 +258,16 @@ module.exports = app => {
                     }, {
                         transacting: t
                     })
-
-                const takeMoney = removeMoney(list.get('totalCost'), user.id, t)
-                const depositMoney = putMoney(list.get('totalCost'), list.get('pickerId'), t)
-                const transac = makePayment(list.get('pickerId'), user.id, list.get('totalCost'), t)
+                const transactionAmount = SITE_COST + (list.get('totalCost') * 1)
+                const takeMoney = removeMoney(transactionAmount, user.id, t)
+                const depositMoney = putMoney(transactionAmount, list.get('pickerId'), t)
+                const transac = makePayment(list.get('pickerId'), user.id, transactionAmount, t)
 
                 return Promise.all([listUpdated, takeMoney, depositMoney, transac])
-            }).then(_ => res.status(200).send('Delivered confirmed and picker paid.'))
+            })
+            .then(_ => res.status(200).send('Delivery confirmed and picker paid.'))
             .catch(err => {
-                console.log(err)
+                // console.log(err)
                 return res.status(500).send(err)
             })
 
@@ -352,7 +354,7 @@ module.exports = app => {
             return res.status(403).send(msg)
         }
 
-        console.log(total)
+        // console.log(total)
         List
             .forge({
                 id: list.id,
@@ -489,7 +491,8 @@ module.exports = app => {
         List
             .query(qb => {
                 qb.where({
-                    pickerId: user.id
+                    pickerId: user.id,
+                    isConfirmed: false
                 })
             })
             .fetchPage({

@@ -56,7 +56,9 @@
 										label="Qty bought *"
 										hint="How much did you buy? Put 0 if you did not buy"
 										type="number"
+										min="0"
 										v-model="list.editedItem.qtyBought"
+										:rules="[rules.required, rules.positive]"
 									></v-text-field>
 								</v-flex>
 								<v-flex xs12 sm6>
@@ -65,7 +67,9 @@
 										hint="How much did you pay? Put 0 if you did not buy"
 										type="number"
 										prefix="$"
+										min="0"
 										v-model="list.editedItem.cost"
+										:rules="[rules.required, rules.positive]"
 									></v-text-field>
 								</v-flex>
 							</v-layout>
@@ -91,6 +95,10 @@ export default {
 		return {
 			editedItem: {},
 			valid: true,
+			rules: {
+				required: v => !!v || 'Required field.',
+				positive: v => (v && v >= 0) || 'Number must be 0 or positive.',
+			},
 		};
 	},
 	computed: {

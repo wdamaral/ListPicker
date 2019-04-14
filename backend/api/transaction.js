@@ -153,7 +153,14 @@ module.exports = app => {
             existsOrError(wallet, 'Wallet not found.')
 
             Transaction
-                .query(qb => qb)
+                .query(
+                    qb => qb.where({
+                        fromId: wallet.id
+                    })
+                    .orWhere({
+                        toId: wallet.id
+                    })
+                )
                 .orderBy('-date')
                 .fetchPage({
                     withRelated: ['from.user', 'to.user'],
@@ -165,8 +172,6 @@ module.exports = app => {
                     pagination: transactions.pagination
                 }))
                 .catch(err => res.status(500).send(err))
-
-            return
         } catch (msg) {
             return res.status(400).send(msg)
         }
