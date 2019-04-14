@@ -401,9 +401,18 @@ module.exports = app => {
         const page = req.query.page || 1
 
         List
-            .query(qb => qb)
+            .query(qb => qb.where({
+                pickerId: null
+            }))
             .fetchPage({
-                withRelated: ['owner', 'picker', 'store'],
+                withRelated: ['store',
+                    {
+                        'owner': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    },
+                    {
+                        'picker': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    }
+                ],
                 columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 12,
                 page
@@ -447,15 +456,22 @@ module.exports = app => {
             .query(qb => {
                 qb.where({
                     ownerId: user.id,
-                    confirmed: true
+                    isConfirmed: true
                 })
                 qb.orWhere({
                     pickerId: user.id,
-                    confirmed: true
+                    isConfirmed: true
                 })
             })
             .fetchPage({
-                withRelated: ['owner', 'picker', 'store'],
+                withRelated: ['store',
+                    {
+                        'owner': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    },
+                    {
+                        'picker': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    }
+                ],
                 columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page
@@ -477,7 +493,14 @@ module.exports = app => {
                 })
             })
             .fetchPage({
-                withRelated: ['owner', 'picker', 'store'],
+                withRelated: ['store',
+                    {
+                        'owner': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    },
+                    {
+                        'picker': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    }
+                ],
                 columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page
@@ -495,11 +518,19 @@ module.exports = app => {
         List
             .query(qb => {
                 qb.where({
-                    ownerId: user.id
+                    ownerId: user.id,
+                    isConfirmed: false
                 })
             })
             .fetchPage({
-                withRelated: ['owner', 'picker', 'store'],
+                withRelated: ['store',
+                    {
+                        'owner': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    },
+                    {
+                        'picker': qb => qb.select('firstName', 'latitude', 'longitude', 'profilePicture', 'id')
+                    }
+                ],
                 columns: ['id', 'totalItems', 'createdAt', 'updatedAt', 'storeId', 'ownerId', 'pickerId'],
                 pageSize: 10,
                 page

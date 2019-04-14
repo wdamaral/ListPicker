@@ -1,6 +1,6 @@
 <template>
 	<v-layout fill-height justify-center mx-3>
-		<v-flex pa-4 xs10 sm8 md5 align-self-center>
+		<v-flex pa-3 xs12 sm8 md5 align-self-center>
 			<v-card>
 				<v-img
 					class="white--text"

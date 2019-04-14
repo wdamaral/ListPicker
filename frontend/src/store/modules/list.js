@@ -343,6 +343,28 @@ export default {
                     })
                 })
         },
+        GET_MY_HISTORY({
+            commit
+        }) {
+            const url = `${baseApiUrl}/lists/history/closed`
+
+            axios
+                .get(url)
+                .then(lists =>
+                    commit('SET_LISTS', lists.data))
+                .catch(err => {
+                    let error
+                    if (err.response.data) {
+                        error = err.response.data
+                    } else {
+                        error = err
+                    }
+
+                    commit('activeSnackbar', error, {
+                        root: true
+                    })
+                })
+        },
         GET_MY_PICKS({
             commit
         }) {

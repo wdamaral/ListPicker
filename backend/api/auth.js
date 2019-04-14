@@ -37,6 +37,7 @@ module.exports = app => {
             admin: user.admin,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
+            profilePicture: user.profilePicture,
             iat: now,
             exp: now + (60 * 60 * 24)
         }

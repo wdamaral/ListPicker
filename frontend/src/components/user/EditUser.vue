@@ -8,35 +8,38 @@
 							<v-toolbar card prominent class="green lighten-4 elevation-1">
 								<v-avatar v-if="!edit" size="100" color="green lighten-2" class="elevation-4">
 									<v-icon v-if="!user.data.profilePicture" light size="70">account_circle</v-icon>
-									<img v-else :src="getPath + user.data.profilePicture" alt="avatar">
+									<img v-else :src="profileUrl + user.data.profilePicture" alt="avatar">
 								</v-avatar>
-								<v-tooltip v-else bottom>
-									<template v-slot:activator="{ on }">
-										<v-avatar
-											size="100"
-											color="green lighten-2"
-											class="elevation-4 cursor"
-											@click="pickFile"
-											v-on="on"
-										>
-											<img v-if="newPicture" :src="tempUrl + newPicture" alt="avatar">
-											<img
-												v-else-if="user.data.profilePicture"
-												:src="profileUrl + user.data.profilePicture"
-												alt="avatar"
+								<div v-else>
+									<v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-avatar
+												size="100"
+												color="green lighten-2"
+												class="elevation-4 cursor"
+												@click="pickFile"
+												v-on="on"
 											>
-											<v-icon v-else dark size="70">account_circle</v-icon>
-										</v-avatar>
-									</template>
-									<span>Upload new picture</span>
-								</v-tooltip>
-								<input
-									type="file"
-									style="display: none"
-									ref="image"
-									accept="image/jpeg, image/jpg image/png, image/gif"
-									@change="upload($event)"
-								>
+												<img v-if="newPicture" :src="tempUrl + newPicture" alt="avatar">
+												<img
+													v-else-if="user.data.profilePicture"
+													:src="profileUrl + user.data.profilePicture"
+													alt="avatar"
+												>
+												<v-icon v-else dark size="70">account_circle</v-icon>
+											</v-avatar>
+
+											<input
+												type="file"
+												style="display: none"
+												ref="image"
+												accept="image/jpeg, image/jpg image/png, image/gif"
+												@change="upload($event)"
+											>
+										</template>
+										<span>Upload new picture</span>
+									</v-tooltip>
+								</div>
 							</v-toolbar>
 
 							<v-card-text>

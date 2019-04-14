@@ -72,7 +72,7 @@ module.exports = app => {
     app.route('/lists/:id/items')
         .all(app.config.passport.authenticate())
         .get(app.api.listItem.getByListId)
-        .post(app.api.listItem.save)
+        .post(listOwner(app.api.listItem.save))
 
     app.route('/lists/:id/confirmed')
         .all(app.config.passport.authenticate())
@@ -90,20 +90,20 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .get(app.api.list.getById)
         .patch(app.api.list.edit)
-        .delete(app.api.list.remove)
-        .put(app.api.list.saveReceipt)
+        .delete(listOwner(app.api.list.remove))
+        .put(listPicker(app.api.list.saveReceipt))
 
     app.route('/lists/history/closed')
         .all(app.config.passport.authenticate())
-        .post(listPicker(app.api.list.getOldByUserId))
+        .get(app.api.list.getHistoryByUserId)
 
     app.route('/lists/history/own')
         .all(app.config.passport.authenticate())
-        .post(listPicker(app.api.list.getOwnedByUserId))
+        .get(listOwner(app.api.list.getOwnedByUserId))
 
     app.route('/lists/history/pick')
         .all(app.config.passport.authenticate())
-        .post(listPicker(app.api.list.getOwnedByUserId))
+        .get(listPicker(app.api.list.getOwnedByUserId))
 
     app.route('/lists/:listId/items/:itemId/delete')
         .all(app.config.passport.authenticate())

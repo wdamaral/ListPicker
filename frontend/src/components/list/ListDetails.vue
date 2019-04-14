@@ -98,8 +98,8 @@
 													validate-on-blur
 													color="green"
 												></v-text-field>
-												<p v-else class="caption">
-													<v-icon v-if="list.list.isBought" small>mdi-receipt</v-icon>
+												<p v-else class="subheading">
+													<v-icon v-if="list.list.isBought">mdi-receipt</v-icon>
 													{{ list.list.receiptNumber }}
 												</p>
 											</v-flex>
@@ -135,7 +135,7 @@
 													v-on:change="setConfirmedTime"
 													:disabled="list.list.isConfirmed"
 													color="green lighten-2"
-													label="Mark as confirmed"
+													label="Confirm delivery"
 												></v-switch>
 											</v-flex>
 										</v-layout>
@@ -181,8 +181,14 @@
 														<td class="text-xs-left">{{ props.item.quantity }}</td>
 														<td class="text-xs-left">{{ props.item.unit }}</td>
 														<td class="text-xs-left">{{ props.item.brand }}</td>
-														<td v-if="list.list.pickerId === user.auth.id" class="text-xs-left">
-															<v-icon v-if="!list.list.isBought" @click="editItem(props.item)">edit</v-icon>
+														<td v-if="list.list.pickerId" class="text-xs-left">
+															<v-icon
+																v-if="!list.list.isBought && list.list.pickerId === user.auth.id"
+																@click="editItem(props.item)"
+															>edit</v-icon>
+															<v-icon
+																v-if="list.list.pickerId && list.list.pickerId !== user.auth.id"
+															>mdi-hand-okay</v-icon>
 															<v-icon v-if="list.list.isBought">mdi-cash</v-icon>
 															<v-icon v-if="list.list.isDelivered">mdi-truck-delivery</v-icon>
 															<v-icon v-if="list.list.isConfirmed">mdi-credit-card</v-icon>
@@ -200,12 +206,16 @@
 																<li class="flex-item text-xs-left" data-label="Qty.">{{ props.item.quantity }}</li>
 																<li class="flex-item text-xs-left" data-label="Unit">{{ props.item.unit }}</li>
 																<li class="flex-item text-xs-left" data-label="Brand">{{ props.item.brand }}</li>
-																<li
-																	class="flex-item text-xs-left"
-																	data-label="Action"
-																	v-if="list.list.pickerId === user.auth.id"
-																>
-																	<v-icon small v-if="!list.list.isBought" @click="editItem(props.item)">edit</v-icon>
+																<li class="flex-item text-xs-left" data-label="Action">
+																	<v-icon
+																		small
+																		v-if="!list.list.isBought && list.list.pickerId === user.auth.id"
+																		@click="editItem(props.item)"
+																	>edit</v-icon>
+																	<v-icon
+																		small
+																		v-if="list.list.pickerId && list.list.pickerId !== user.auth.id"
+																	>mdi-hand-okay</v-icon>
 																	<v-icon small v-if="list.list.isBought">mdi-cash</v-icon>
 																	<v-icon small v-if="list.list.isDelivered">mdi-truck-delivery</v-icon>
 																	<v-icon small v-if="list.list.isConfirmed">mdi-credit-card</v-icon>
@@ -245,7 +255,9 @@
 										</v-layout>
 									</v-flex>
 								</v-layout>
-								<Address v-if="list.list.pickerId === user.auth.id || list.list.ownerId === user.auth.id"/>
+								<Address
+									v-if="(list.list.pickerId === user.auth.id  && list.list.isBought) || list.list.ownerId === user.auth.id"
+								/>
 								<v-layout v-if="list.list.owner" row wrap py-4>
 									<v-flex>
 										<h4 class="display-1 py-2">Location to deliver</h4>

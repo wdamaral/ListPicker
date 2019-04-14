@@ -55,18 +55,25 @@
 												@click="pickFile"
 												v-bind:class="editedItem.id ? 'cursor' : ''"
 											/>
-											<v-img class="cursor" v-else :src="imageUrl + 'noimage.png'" @click="pickFile"/>
+											<v-img
+												class="cursor"
+												v-on="on"
+												v-else
+												:src="imageUrl + 'noimage.png'"
+												@click="pickFile"
+											/>
+
+											<input
+												:disabled="mode === 'remove'"
+												type="file"
+												style="display: none"
+												ref="image"
+												accept="image/jpeg, image/jpg image/png, image/gif, image/png"
+												@change="upload($event)"
+											>
 										</template>
-										<span>Upload new picture</span>
+										<span>Upload new logo</span>
 									</v-tooltip>
-									<input
-										:disabled="mode === 'remove'"
-										type="file"
-										style="display: none"
-										ref="image"
-										accept="image/jpeg, image/jpg image/png, image/gif, image/png"
-										@change="upload($event)"
-									>
 								</v-flex>
 							</v-layout>
 							<div class="body-2 pb-2">Registered stores</div>
@@ -121,49 +128,49 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { baseStoreImgUrl, baseTempImgUrl } from "@/global";
+import { mapState } from 'vuex';
+import { baseStoreImgUrl, baseTempImgUrl } from '@/global';
 export default {
-	name: "StoreAdmin",
+	name: 'StoreAdmin',
 	data: () => ({
-		mode: "save",
+		mode: 'save',
 		uploads: 0,
 		pagination: {},
 		imageUrl: baseStoreImgUrl,
 		tempImgUrl: baseTempImgUrl,
 		valid: false,
 		rules: {
-			required: value => !!value || "Store name is required.",
-			max: v => v.length <= 50 || "Max 50 characters"
+			required: value => !!value || 'Store name is required.',
+			max: v => v.length <= 50 || 'Max 50 characters',
 		},
 		headers: [
-			{ text: "#", sortable: false, value: "id" },
+			{ text: '#', sortable: false, value: 'id' },
 			{
-				text: "Store name",
-				align: "left",
-				value: "name"
+				text: 'Store name',
+				align: 'left',
+				value: 'name',
 			},
-			{ text: "Description", value: "description" },
-			{ text: "Logo", value: "imageUrl", sortable: false },
-			{ text: "Actions", value: "id", sortable: false }
+			{ text: 'Description', value: 'description' },
+			{ text: 'Logo', value: 'imageUrl', sortable: false },
+			{ text: 'Actions', value: 'id', sortable: false },
 		],
 		editedItem: {
-			name: "",
-			description: ""
+			name: '',
+			description: '',
 		},
-		editedPicture: ""
+		editedPicture: '',
 	}),
 
 	computed: {
 		...mapState({
-			store: state => state.store
+			store: state => state.store,
 		}),
 		getPagination: () => {
-			let _pagination = this.$store.getters["store/GET_PAGINATION"];
+			let _pagination = this.$store.getters['store/GET_PAGINATION'];
 			this.pagination.rowsPerPage = _pagination.pageSize;
 			this.pagination.page = _pagination.page;
 			this.pagination.totalItems = _pagination.rowCount;
-		}
+		},
 	},
 
 	mounted() {
@@ -172,40 +179,40 @@ export default {
 
 	methods: {
 		async getStores() {
-			await this.$store.dispatch("store/GET_STORES");
+			await this.$store.dispatch('store/GET_STORES');
 		},
 		editItem(item) {
 			this.editedItem = Object.assign({}, item);
-			this.mode = "save";
+			this.mode = 'save';
 		},
 
 		deleteItem(item) {
 			this.editedItem = Object.assign({}, item);
-			this.mode = "remove";
+			this.mode = 'remove';
 		},
 		async remove() {
 			this.$refs.form.resetValidation();
-			await this.$store.dispatch("store/REMOVE", this.editedItem);
+			await this.$store.dispatch('store/REMOVE', this.editedItem);
 			this.reset();
 		},
 		reset() {
-			this.mode = "save";
+			this.mode = 'save';
 			this.editedItem = {
-				name: "",
-				description: ""
+				name: '',
+				description: '',
 			};
 			const input = this.$refs.image;
-			input.type = "text";
-			input.type = "file";
+			input.type = 'text';
+			input.type = 'file';
 			this.$refs.form.resetValidation();
 			this.uploads = 0;
 			//this.getStores();
 		},
 		save() {
 			if (this.$refs.form.validate()) {
-				this.$store.dispatch("store/SAVE", {
+				this.$store.dispatch('store/SAVE', {
 					store: this.editedItem,
-					uploads: this.uploads
+					uploads: this.uploads,
 				});
 				this.reset();
 			}
@@ -214,9 +221,9 @@ export default {
 			this.$refs.image.click();
 		},
 		async upload(event) {
-			let imageUrl = await this.$store.dispatch("UPLOAD", event);
+			let imageUrl = await this.$store.dispatch('UPLOAD', event);
 
-			if (imageUrl && this.editedPicture === "") {
+			if (imageUrl && this.editedPicture === '') {
 				this.uploads++;
 				this.editedPicture = this.editedItem.imageUrl;
 				this.editedItem.imageUrl = imageUrl;
@@ -225,8 +232,8 @@ export default {
 				this.editedItem.imageUrl = imageUrl;
 			}
 			this.$forceUpdate();
-		}
-	}
+		},
+	},
 };
 </script>
 

@@ -1,7 +1,7 @@
 <template>
 	<div class="new-list">
 		<v-container pa-0 my-0>
-			<v-form v-model="valid">
+			<v-form lazy-validation v-model="valid">
 				<v-layout row justify-space-between wrap pa-3>
 					<v-flex>
 						<v-card class="card--flex-toolbar">
@@ -195,6 +195,7 @@ export default {
 		},
 	},
 	mounted() {
+		this.$store.commit('list/SET_LIST', {});
 		this.$store.commit('list/SET_MODE', 'NEW');
 		this.$store.dispatch('store/GET_STORES');
 	},

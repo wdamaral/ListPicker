@@ -165,15 +165,15 @@ export default {
 				},
 			],
 			itemsAdmin: [
-				{
-					title: 'Dashboard',
-					icon: 'mdi-view-dashboard',
-					route: '/admin',
-				},
+				// {
+				// 	title: 'Dashboard',
+				// 	icon: 'mdi-view-dashboard',
+				// 	route: '/admin',
+				// },
 				{ title: 'Stores', icon: 'mdi-store', route: '/admin/stores' },
 			],
 
-			mini: false,
+			mini: true,
 			right: null,
 		};
 	},

@@ -1,24 +1,19 @@
 <template>
-    <div class="admin-pages">
-        <h4 class="display-1"> 
-            <v-icon large class="black--text" 
-                v-if="icon">{{ main }} </v-icon> {{ sub }}
-        </h4>
-        <hr>
-    </div>
+	<div class="admin-pages">
+		<h4 class="display-1 red--text">
+			<v-icon large color="red" v-if="icon">{{icon}}</v-icon>
+			{{ main }}
+		</h4>
+		<v-divider class="pb-4"/>
+	</div>
 </template>
 
 <script>
 export default {
-    name: 'PageTitle',
-    props: ['icon', 'main', 'sub']
-}
+	name: 'PageTitle',
+	props: ['icon', 'main'],
+};
 </script>
 
 <style>
-.admin-pages {
-    margin-left: 50px;
-    margin-right: 50px;
-    margin-top: 20px
-}
 </style>

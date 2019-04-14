@@ -66,7 +66,7 @@ const routes = [
         },
         children: [{
                 path: '',
-                component: Dashboard
+                redirect: 'stores'
             },
             {
                 path: 'stores',

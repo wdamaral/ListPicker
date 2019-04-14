@@ -1,7 +1,7 @@
 <template>
 	<v-container fluid ma-0 pa-0>
-		<v-layout row wrap>
-			<v-flex xs12 md3 pt-5 :key="transac.id" v-for="transac in wallet.transactions.transactions">
+		<v-layout v-if="wallet.transactions.transactions" row wrap>
+			<v-flex xs12 sm6 md3 pt-5 :key="transac.id" v-for="transac in wallet.transactions.transactions">
 				<v-card class="ma-1" min-height="160">
 					<v-sheet
 						class="v-sheet--offset mx-auto"

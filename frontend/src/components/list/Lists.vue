@@ -1,7 +1,8 @@
 <template>
 	<NoLists v-if="list.lists.lists.length == 0"/>
 	<v-container v-else grid-list-md>
-		<v-layout row wrap>
+		<PageTitle :icon="getIcon()" :main="getMain()"/>
+		<v-layout fill-height row wrap>
 			<v-flex v-for="item in list.lists.lists" :key="item.id" xs12 sm6 lg3>
 				<v-hover>
 					<v-card
@@ -49,6 +50,18 @@
 				</v-hover>
 			</v-flex>
 		</v-layout>
+		<v-layout fill-height row mt-4 justify-center>
+			<div v-if="list.lists.pagination" class="text-xs-center">
+				<v-pagination
+					color="green lighten-2"
+					v-model="list.lists.pagination.page"
+					:length="list.lists.pagination.pageCount"
+					:total-visible="5"
+					circle
+					@input="loadTransactions(list.lists.pagination.page)"
+				></v-pagination>
+			</div>
+		</v-layout>
 	</v-container>
 </template>
 
@@ -57,6 +70,7 @@ import { mapState } from 'vuex';
 import { baseProfilePicUrl, baseStoreImgUrl } from '@/global';
 import moment from 'moment';
 import NoLists from './NoLists';
+import PageTitle from '@/components/template/PageTitle';
 export default {
 	name: 'Lists',
 	data() {
@@ -98,13 +112,39 @@ export default {
 				case '/lists/mypicks':
 					this.$store.dispatch('list/GET_MY_PICKS');
 					break;
+
+				case '/lists/history':
+					this.$store.dispatch('list/GET_MY_HISTORY');
+					break;
 			}
 		},
 		seeDetails(id) {
 			this.$router.push(`/lists/${id}`);
 		},
+		getMain() {
+			if (this.$route.name === 'myPicks') {
+				return 'My Picks';
+			} else if (this.$route.name === 'myLists') {
+				return 'My Lists';
+			} else if (this.$route.name === 'history') {
+				return 'My History';
+			} else {
+				return 'All lists';
+			}
+		},
+		getIcon() {
+			if (this.$route.name === 'myPicks') {
+				return 'mdi-hand-okay';
+			} else if (this.$route.name === 'myLists') {
+				return 'mdi-format-list-checkbox';
+			} else if (this.$route.name === 'history') {
+				return 'mdi-receipt';
+			} else {
+				return 'mdi-view-list';
+			}
+		},
 	},
-	components: { NoLists },
+	components: { NoLists, PageTitle },
 };
 </script>
 
