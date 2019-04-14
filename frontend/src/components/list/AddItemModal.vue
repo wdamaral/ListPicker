@@ -112,6 +112,7 @@ export default {
 				} else {
 					this.$store.commit('list/ADD_ITEM', this.getEditedItem);
 					this.$store.commit('list/SET_EDITED_ITEM', {});
+					this.$refs.form.reset();
 				}
 				this.valid = true;
 			}

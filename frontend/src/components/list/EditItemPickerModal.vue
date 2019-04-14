@@ -108,6 +108,7 @@ export default {
 			this.$store.dispatch('list/PICKER_UPDATE_LIST');
 			this.$store.commit('list/SET_EDITED_ITEM', {});
 			this.$store.commit('list/SHOW_MODAL');
+			this.$refs.form.reset();
 		},
 	},
 };

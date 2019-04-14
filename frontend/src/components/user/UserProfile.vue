@@ -21,25 +21,13 @@
 								class="body-2 text-xs-right font-weight-light"
 							>Joined in {{user.data.createdAt | moment}}</div>
 							<v-container fluid>
-								<p class="pt-4">
+								<!-- <p class="pt-4">
 									<v-icon large>format_quote</v-icon>
 								</p>
 								<p class="pl-4 body-1">This is just me.</p>
 								<p class="pb-4">
 									<v-icon large>format_quote</v-icon>
-								</p>
-								<p class="body-2 font-weight-light">
-									<v-icon small>local_grocery_store</v-icon>
-									Last list fulfilled: {{ lastListFulfilled | moment }}
-								</p>
-								<p class="body-2 font-weight-light">
-									<v-icon small>time_to_leave</v-icon>
-									Last delivery made: {{ lastDeliveryConfirmed | moment }}
-								</p>
-								<p class="body-2 font-weight-light">
-									<v-icon small>assignment_turned_in</v-icon>
-									Last list picked: {{lastListPicked | moment }}
-								</p>
+								</p>-->
 								<v-layout row wrap pa-3>
 									<v-flex xs12>
 										<p class="body-2 font-weight-light">
@@ -68,7 +56,7 @@
 <script>
 import { baseApiUrl } from '@/global';
 import Map from '@/components/template/Map';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import moment from 'moment';
 
 export default {
@@ -81,12 +69,6 @@ export default {
 	},
 	computed: {
 		...mapState({ user: state => state.user }),
-		...mapGetters('user', [
-			'lastListFulfilled',
-			'lastListPicked',
-			'lastDeliveryConfirmed',
-			'activeLists',
-		]),
 		checkUser() {
 			if (
 				this.user.auth.admin ||

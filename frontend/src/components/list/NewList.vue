@@ -195,7 +195,7 @@ export default {
 		},
 	},
 	mounted() {
-		this.$store.commit('list/SET_LIST', {});
+		this.$store.commit('list/SET_LIST', { listItems: [] });
 		this.$store.commit('list/SET_MODE', 'NEW');
 		this.$store.dispatch('store/GET_STORES');
 	},

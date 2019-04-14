@@ -24,7 +24,7 @@ module.exports = app => {
     }
 
     function isValidPassword(value, msg) {
-        let rgx = new RegExp("([a-zA-Z0-9]{8,})$")
+        let rgx = new RegExp("(?=.{8,})")
         if (!rgx.test(value)) throw msg
     }
 
