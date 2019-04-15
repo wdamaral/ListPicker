@@ -53,13 +53,10 @@ export default {
             commit,
             dispatch
         }, payload) {
-            const {
-                store
-            } = payload
-            const method = store.id ? 'put' : 'post'
-            const id = store.id ? `/${store.id}` : ''
+            const method = payload.store.id ? 'put' : 'post'
+            const id = payload.store.id ? `/${payload.store.id}` : ''
 
-            axios[method](`${baseApiUrl}/stores${id}`, store)
+            axios[method](`${baseApiUrl}/stores${id}`, payload)
                 .then(() => {
                     let msg
                     if (id) {

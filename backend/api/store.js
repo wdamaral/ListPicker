@@ -14,7 +14,7 @@ module.exports = app => {
 
     const insert = async (req, res) => {
         const store = {
-            ...req.body
+            ...req.body.store
         }
         const uploads = req.body.uploads
 
@@ -65,8 +65,9 @@ module.exports = app => {
 
     const update = (req, res) => {
         const store = {
-            ...req.body
+            ...req.body.store
         }
+        // console.log(req.body)
         const uploads = req.body.uploads
 
         if (req.params.id) store.id = req.params.id
@@ -84,7 +85,7 @@ module.exports = app => {
             } catch (msg) {
                 return res.status(400).send(msg)
             }
-
+            // console.log(uploads)
             if (uploads > 0) {
                 return app.bookshelf.transaction(t => {
                         let pic = store.imageUrl
