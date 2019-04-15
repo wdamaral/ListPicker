@@ -11,19 +11,30 @@ module.exports = app => {
         List
     } = app.models.index
 
-    const save = (req, res) => {
+    const save = async (req, res) => {
         const item = {
             ...req.body
         }
-        if (req.params.itemId) listItem.id = req.params.itemId
+
+        if (req.params.id) item.listId = req.params.id
         try {
             existsOrError(item.item, 'Item name cannot be blank.')
             existsOrError(item.quantity, 'Quantity cannot be blank.')
             existsOrError(item.unit, 'Unit cannot be blank.')
             existsOrError(item.listId, 'List not found.')
 
+            const list = await List.forge({
+                id: item.listId,
+                pickerId: null
+            }).fetch()
+            try {
+
+                existsOrError(list, 'List already picked. You cannot edit it.')
+            } catch (msg) {
+                return res.status(403).send(msg)
+            }
         } catch (msg) {
-            res.status(400).send(msg)
+            return res.status(400).send(msg)
         }
 
         app.db('listItems')
@@ -59,10 +70,8 @@ module.exports = app => {
         const updates = {
             ...req.body
         }
-        // console.log(updates)
-
         try {
-            let list = await List
+            const list = await List
                 .where({
                     id: listId
                 })
@@ -119,6 +128,19 @@ module.exports = app => {
             existsOrError(item, 'Item not found for this list.')
             // console.log(item)
 
+
+            try {
+                const list = await List
+                    .where({
+                        id: listId
+                    })
+                    .fetch()
+
+                notExistsOrError(list.get('pickerId'), 'You cannot edit this list. It is already picked.')
+            } catch (msg) {
+                return res.status(403).send(msg)
+            }
+
             let rowsDeleted = await new ListItem(item).destroy()
             try {
                 notExistsOrError(rowsDeleted.message, 'Item not found for this list.')
@@ -146,22 +168,6 @@ module.exports = app => {
             return res.status(500).send(msg)
         }
     }
-
-    // const getByListId = (req, res) => {
-    //     const listId = req.params.id
-    //     const page = req.query.page || 1
-
-    //     try {
-    //         isValidID(listId, 'ID is not valid')
-    //         ListItem
-    //             .query(qb => qb.where('listId', '=', listId))
-    //             .fetchPage({ pageSize: 10, page })
-    //             .then(items => res.status(200).json({items: items, pagination: items.pagination}))
-    //             .catch(err => res.status(500).send(err))
-    //     } catch(msg) {
-    //         return res.status(400).send(msg)
-    //     }
-    // }
 
     const getByListId = (listId) => {
         //const listId = req.params.id

@@ -8,7 +8,7 @@
 						<v-card class="card--flex-toolbar">
 							<v-toolbar card prominent class="green lighten-4 elevation-1">
 								<v-avatar
-									v-if="list.list.owner &&  list.list.owner.profilePicture"
+									v-if="list.list.owner && list.list.owner.profilePicture"
 									class="elevation-3"
 									size="100"
 								>
@@ -17,10 +17,18 @@
 								<v-avatar v-else class="green lighten-2 elevation-3" size="100">
 									<v-icon size="60" dark>account_circle</v-icon>
 								</v-avatar>
-								<p
-									v-if="list.list.owner"
-									class="headline pl-4 elevation"
-								>{{list.list.owner.firstName}}'s list</p>
+								<v-layout justify-space-between>
+									<p
+										v-if="list.list.owner"
+										class="headline pl-4 elevation"
+									>{{list.list.owner.firstName}}'s list</p>
+									<v-icon
+										v-if="list.list.ownerId === user.auth.id && !list.list.pickedAt"
+										icon
+										flat
+										@click="editList"
+									>mdi-file-document-edit</v-icon>
+								</v-layout>
 							</v-toolbar>
 							<v-card-text>
 								<v-layout row justify-space-between>
@@ -482,6 +490,10 @@ export default {
 		},
 		saveReceipt() {
 			this.$store.dispatch('list/SAVE_RECEIPT');
+		},
+		editList() {
+			const editLink = `${this.$route.params.id}/edit`;
+			this.$router.push(editLink);
 		},
 	},
 	created() {

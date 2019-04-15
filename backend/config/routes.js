@@ -4,12 +4,12 @@ const listPicker = require('./listPicker')
 
 module.exports = app => {
 
-    app.post('/signup', app.api.user.insert)
+    app.post('/users', app.api.user.insert)
     app.post('/signin', app.api.auth.signin)
     app.post('/validateToken', app.api.auth.validateToken)
     app.post('/forgot-password', app.api.auth.forgotPassword)
     app.post('/reset-password/:token', app.api.auth.resetPassword)
-    app.post('/users', app.api.user.insert)
+    app.get('/validate-list/:id', app.api.list.validateList)
 
     app.route('/users')
         .all(app.config.passport.authenticate())
@@ -42,7 +42,6 @@ module.exports = app => {
         .get(app.api.user.getById)
         .delete(app.api.user.deleteUser)
 
-
     app.route('/stores')
         .all(app.config.passport.authenticate())
         .get(app.api.store.get)
@@ -71,7 +70,6 @@ module.exports = app => {
 
     app.route('/lists/:id/items')
         .all(app.config.passport.authenticate())
-        .get(app.api.listItem.getByListId)
         .post(listOwner(app.api.listItem.save))
 
     app.route('/lists/:id/confirmed')
@@ -97,14 +95,6 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .get(app.api.list.getHistoryByUserId)
 
-    app.route('/lists/history/own')
-        .all(app.config.passport.authenticate())
-        .get(listOwner(app.api.list.getOwnedByUserId))
-
-    app.route('/lists/history/pick')
-        .all(app.config.passport.authenticate())
-        .get(listPicker(app.api.list.getOwnedByUserId))
-
     app.route('/lists/:listId/items/:itemId/delete')
         .all(app.config.passport.authenticate())
         .delete(app.api.listItem.remove)
@@ -117,7 +107,7 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .post(app.api.list.pickList)
 
-
     app.route('/upload')
+        .all(app.config.passport.authenticate())
         .post(app.api.imageUpload.uploadPicture)
 }

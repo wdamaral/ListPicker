@@ -14,11 +14,12 @@ module.exports = app => {
 
     const insert = async (req, res) => {
         const store = {
-            ...req.body.store
+            ...req.body
         }
         const uploads = req.body.uploads
 
         if (req.params.id) store.id = req.params.id
+
 
         try {
             existsOrError(store.name, 'Name cannot be blank')
@@ -64,7 +65,7 @@ module.exports = app => {
 
     const update = (req, res) => {
         const store = {
-            ...req.body.store
+            ...req.body
         }
         const uploads = req.body.uploads
 

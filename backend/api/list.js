@@ -111,6 +111,8 @@ module.exports = app => {
         const list = {
             ...req.body
         }
+
+        // console.log(list)
         delete list.owner
         delete list.picker
         delete list.store
@@ -119,12 +121,12 @@ module.exports = app => {
         let listFromDb
         try {
             listFromDb = await new List({
-                'id': list.id
+                id: list.id
             }).fetch({
                 columns: ['ownerId', 'pickerId']
             })
             if (!listFromDb) {
-                return res.status(204).send('No lists found.')
+                return res.status(400).send('No lists found.')
             }
         } catch (err) {
             return res.status(500).send(err)
@@ -168,8 +170,10 @@ module.exports = app => {
                 .catch(err => res.status(500).send(err))
 
         } else if (listFromDb.get('ownerId') === user.id) {
+            if (listFromDb.get('pickerId')) return res.status(403).send('List is already picked. You cannot edit.')
             let body = _.pick(req.body, ['storeId'])
-            let itemsFromBody = req.body.listItems
+            let itemsFromBody = [...req.body.listItems]
+
 
             try {
                 existsOrError(body.storeId, 'Store not selected.')
@@ -235,12 +239,13 @@ module.exports = app => {
                 id: req.params.id,
                 ownerId: user.id,
                 isBought: true,
-                isDelivered: true
+                isDelivered: true,
             }).fetch()
 
 
 
             existsOrError(list, 'List cannot be confirmed yet. It might not be delivered.')
+            notExistsOrError(list.get('isConfirmed'), 'List is already confirmed.')
 
         } catch (msg) {
             return res.status(400).send(msg)
@@ -343,7 +348,7 @@ module.exports = app => {
                 for (const listItem of list.related('listItems')) {
                     existsOrError(listItem.get('cost'), 'All items must have a price.')
                     existsOrError(listItem.get('qtyBought'), 'All items must have the quantity bought.')
-                    total += listItem.get('qtyBought') * 1
+                    total += listItem.get('totalCost') * 1
                 }
                 existsOrError(list.get('receiptNumber'), 'Please, update the receipt number first.')
             } catch (msg) {
@@ -451,6 +456,25 @@ module.exports = app => {
         }
     }
 
+    const validateList = (req, res) => {
+        //console.log(req)
+        try {
+            isValidID(req.params.id, 'ID not valid.')
+            List
+                .where('id', req.params.id)
+                .fetch({
+                    columns: ['ownerId', 'pickerId']
+                })
+                .then(list => {
+                    console.log(list)
+                    return res.status(200).send(list)
+                })
+                .catch(err => res.status(500).send(err))
+        } catch (msg) {
+            return res.status(400).send(msg)
+        }
+    }
+
     const getHistoryByUserId = (req, res) => {
         const page = req.query.page || 1
         const user = req.user
@@ -518,6 +542,8 @@ module.exports = app => {
     const getOwnedByUserId = (req, res) => {
         const page = req.query.page || 1
         const user = req.user
+        console.log('entrou')
+
         List
             .query(qb => {
                 qb.where({
@@ -599,6 +625,7 @@ module.exports = app => {
         getOwnedByUserId,
         markBought,
         pickList,
-        saveReceipt
+        saveReceipt,
+        validateList
     }
 }

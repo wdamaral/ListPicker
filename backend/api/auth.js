@@ -75,7 +75,7 @@ module.exports = app => {
 
     const forgotPassword = async (req, res) => {
         const email = req.body.email
-        console.log('entrou')
+        // console.log('entrou')
         const user = await app.db('users')
             .where({
                 email

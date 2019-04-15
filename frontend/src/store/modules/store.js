@@ -52,9 +52,12 @@ export default {
         SAVE({
             commit,
             dispatch
-        }, store) {
-            const method = store.store.id ? 'put' : 'post'
-            const id = store.store.id ? `/${store.store.id}` : ''
+        }, payload) {
+            const {
+                store
+            } = payload
+            const method = store.id ? 'put' : 'post'
+            const id = store.id ? `/${store.id}` : ''
 
             axios[method](`${baseApiUrl}/stores${id}`, store)
                 .then(() => {

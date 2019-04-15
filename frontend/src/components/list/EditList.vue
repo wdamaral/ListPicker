@@ -138,6 +138,9 @@
 										<v-btn :disabled="!valid" color="success" @click="save" class="flex ma-1" round>
 											<v-icon>save</v-icon>Save
 										</v-btn>
+										<v-btn color="red" @click="removeList" class="flex ma-1" round>
+											<v-icon>mdi-delete</v-icon>Remove
+										</v-btn>
 									</v-flex>
 								</v-layout>
 							</v-card-actions>
@@ -151,7 +154,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { baseApiUrl } from '@/global';
+import { baseProfilePicUrl, baseStoreImgUrl } from '@/global';
 import AddItemModal from './AddItemModal';
 import Map from '@/components/template/Map';
 import moment from 'moment';
@@ -166,7 +169,7 @@ export default {
 			edit: false,
 			expand: false,
 			dialog: false,
-			pictureApiUrl: `${baseApiUrl}/uploads/users/`,
+			pictureApiUrl: baseProfilePicUrl,
 			headers: [
 				{
 					text: '#',
@@ -219,12 +222,12 @@ export default {
 		},
 		getSelectedStore(id) {
 			if (id) {
-				return this.getStoreImage(id);
+				return baseStoreImgUrl + this.getStoreImage(id);
 			}
 		},
-		async save() {
+		save() {
 			if (this.getItemsSize > 0) {
-				await this.$store.dispatch('list/INSERT', this.$router);
+				this.$store.dispatch('list/UPDATE', this.$router);
 			} else {
 				this.$store.commit(
 					'activeSnackbar',
@@ -246,6 +249,10 @@ export default {
 				confirm('Your list will be removed. Ok?') &&
 					this.$store.dispatch('list/REMOVE_LIST', this.$router);
 			}
+		},
+		removeList() {
+			confirm('Your list will be removed. Ok?') &&
+				this.$store.dispatch('list/REMOVE_LIST', this.$router);
 		},
 	},
 	async mounted() {

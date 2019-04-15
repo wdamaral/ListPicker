@@ -9,7 +9,8 @@ module.exports = app => {
         notExistsOrError,
         equalsOrError,
         isValidID,
-        isValidPassword
+        isValidPassword,
+        lengthOrError
     } = app.api.validation
     const {
         User,
@@ -36,6 +37,8 @@ module.exports = app => {
         if (!req.originalUrl.startsWith('/users')) user.admin = false
         if (!req.user || !req.user.admin) user.admin = false
 
+        if (!user.profilePicture) delete user.profilePicture
+
         try {
             existsOrError(user.firstName, 'First name cannot be blank')
             existsOrError(user.lastName, 'Last name cannot be blank')
@@ -45,6 +48,7 @@ module.exports = app => {
             existsOrError(user.city, 'City cannot be blank')
             existsOrError(user.province, 'Province cannot be blank')
             existsOrError(user.postalCode, 'Postal code cannot be blank')
+            lengthOrError(user.unit, 10, 'Unit is invalid.')
             if (user.password) {
                 existsOrError(user.password, 'Password cannot be blank')
                 existsOrError(user.confirmPassword, 'Invalid password confirmation')
@@ -134,7 +138,8 @@ module.exports = app => {
             existsOrError(user.city, 'City cannot be blank')
             existsOrError(user.province, 'Province cannot be blank')
             existsOrError(user.postalCode, 'Postal code cannot be blank')
-            existsOrError(user.password, 'Password cannot be blank')
+            lengthOrError(user.unit, 10, 'Unit is invalid.')
+            existsOrError(user.password, 'Password cannot be blank.')
             existsOrError(user.confirmPassword, 'Invalid password confirmation')
             isValidPassword(user.password, 'Password must contain 8 characters, at least 1 letter, 1 number and 1 special character')
             equalsOrError(user.password, user.confirmPassword,

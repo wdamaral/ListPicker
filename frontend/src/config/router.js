@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import axios from 'axios'
 
 import Home from '@/components/home/Home'
 import NotFound from '@/components/template/NotFound'
+import Forbidden from '@/components/template/Forbidden'
 import AdminHome from '@/components/admin/AdminHome'
 import Dashboard from '@/components/admin/Dashboard'
 import StoreAdmin from '@/components/admin/store/StoreAdmin'
@@ -20,7 +22,8 @@ import WalletHome from '@/components/wallet/WalletHome'
 import UserHome from '@/components/user/UserHome'
 
 import {
-    userKey
+    userKey,
+    baseApiUrl
 } from '@/global'
 
 Vue.use(VueRouter)
@@ -88,7 +91,7 @@ const routes = [
                 component: EditUser,
                 meta: {
                     requiresAdmin: true,
-                    requiresOwner: true
+                    requiresUser: true
                 }
             },
             {
@@ -133,16 +136,24 @@ const routes = [
             {
                 name: 'listEdit',
                 path: ':id/edit',
-                component: EditList
+                component: EditList,
+                meta: {
+                    requiresOwner: true
+                }
             }
         ]
+    },
+    {
+        name: 'fobidden',
+        path: '/403',
+        component: Forbidden
     },
     {
         name: 'all',
         path: '*',
         redirect: '/404'
 
-    }
+    },
 ]
 
 const router = new VueRouter({
@@ -151,7 +162,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const publicPages = ['home', 'signin', 'forgotPassword', 'resetPassword', 'login', 'all'];
+    const publicPages = ['home', 'signin', 'forgotPassword', 'resetPassword', 'login', 'all', 'fobidden'];
     const authRequired = !publicPages.includes(to.name);
 
     const loggedIn = localStorage.getItem(userKey);
@@ -159,6 +170,7 @@ router.beforeEach((to, from, next) => {
     if (authRequired && !loggedIn) {
         return next('/login')
     }
+
     if (to.matched.some(record => record.meta.requiresAdmin)) {
         //implement request => 2nd version
         // const url = `${baseApiUrl}/validate-admin`
@@ -182,6 +194,27 @@ router.beforeEach((to, from, next) => {
             path: '/404'
         })
     }
+
+    if (to.matched.some(record => record.meta.requiresOwner)) {
+        const id = to.params.id
+        const url = `${baseApiUrl}/validate-list/${id}`
+        const user = JSON.parse(loggedIn)
+
+        return axios
+            .get(url)
+            .then(list => {
+
+                if (user && (list.data.ownerId === user.id) && !list.data.pickerId) return next()
+
+                return next({
+                    path: '/403'
+                })
+            })
+            .catch(err => next({
+                path: '/404'
+            }))
+    }
+
     next()
 })
 

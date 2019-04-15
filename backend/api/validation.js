@@ -42,6 +42,10 @@ module.exports = app => {
         if (balance * 1 < amount * 1) throw msg
     }
 
+    function lengthOrError(value, maxLength, msg) {
+        if (value.length > maxLength) throw msg
+    }
+
     return {
         existsOrError,
         notExistsOrError,
@@ -50,6 +54,7 @@ module.exports = app => {
         isNumber,
         isValidPassword,
         differentOrError,
-        isGreaterOrError
+        isGreaterOrError,
+        lengthOrError
     }
 }

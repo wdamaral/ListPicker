@@ -142,9 +142,9 @@ export default {
             commit,
             state
         }, router) {
-            const id = state.data.id ? `/${state.data.id}` : ''
+            const id = state.list.id ? `${state.list.id}` : ''
 
-            axios['put'](`${baseApiUrl}/lists/${id}`, state.list)
+            axios['patch'](`${baseApiUrl}/lists/${id}`, state.list)
                 .then(message => {
                     commit('activeSnackbar', message.data, {
                         root: true
