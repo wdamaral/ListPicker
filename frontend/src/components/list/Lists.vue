@@ -16,7 +16,7 @@
 						style="cursor: pointer;"
 					>
 						<v-card-title>
-							<v-img v-bind:src="baseLogoUrl + item.store.imageUrl"></v-img>
+							<v-img max-height="30" width="160" v-bind:src="baseLogoUrl + item.store.imageUrl"></v-img>
 						</v-card-title>
 
 						<v-card-text class="caption">

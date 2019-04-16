@@ -19,7 +19,7 @@ module.exports = app => {
             putMoney,
             removeMoney
         } = app.api.wallet
-
+        console.log(amount)
         try {
             isValidID(fromId, 'User ID is invalid.')
             isValidID(toId, 'User ID is invalid.')

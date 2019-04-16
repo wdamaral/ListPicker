@@ -166,10 +166,16 @@ router.beforeEach((to, from, next) => {
     const authRequired = !publicPages.includes(to.name);
 
     const loggedIn = localStorage.getItem(userKey);
+    const user = JSON.parse(loggedIn)
+
 
     if (authRequired && !loggedIn) {
         return next('/login')
     }
+
+    if (user && to.path === '/login') next({
+        path: '/lists'
+    })
 
     if (to.matched.some(record => record.meta.requiresAdmin)) {
         //implement request => 2nd version
@@ -185,7 +191,7 @@ router.beforeEach((to, from, next) => {
         //     .catch(err => next({
         //         path: '/'
         //     }))
-        const user = JSON.parse(loggedIn)
+
 
         if (user && user.admin) return next()
 
@@ -198,7 +204,6 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresOwner)) {
         const id = to.params.id
         const url = `${baseApiUrl}/validate-list/${id}`
-        const user = JSON.parse(loggedIn)
 
         return axios
             .get(url)

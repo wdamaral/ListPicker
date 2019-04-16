@@ -138,7 +138,7 @@
 										<v-btn :disabled="!valid" color="success" @click="save" class="flex ma-1" round>
 											<v-icon>save</v-icon>Save
 										</v-btn>
-										<v-btn color="red" @click="removeList" class="flex ma-1" round>
+										<v-btn color="red" dark @click="removeList" class="flex ma-1" round>
 											<v-icon>mdi-delete</v-icon>Remove
 										</v-btn>
 									</v-flex>

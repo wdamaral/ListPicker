@@ -140,8 +140,8 @@ export default {
 		tempImgUrl: baseTempImgUrl,
 		valid: false,
 		rules: {
-			required: value => !!value || 'Store name is required.',
-			max: v => v.length <= 50 || 'Max 50 characters',
+			required: v => !!v || 'Store name is required.',
+			max: v => (v && v.length <= 50) || 'Max 50 characters',
 		},
 		headers: [
 			{ text: '#', sortable: false, value: 'id' },
@@ -162,9 +162,11 @@ export default {
 	}),
 
 	computed: {
+		//It maps the state of the Vue store
 		...mapState({
 			store: state => state.store,
 		}),
+
 		getPagination: () => {
 			let _pagination = this.$store.getters['store/GET_PAGINATION'];
 			this.pagination.rowsPerPage = _pagination.pageSize;
@@ -172,29 +174,33 @@ export default {
 			this.pagination.totalItems = _pagination.rowCount;
 		},
 	},
-
+	//called when the the page is mounted
 	mounted() {
 		this.getStores();
 	},
 
 	methods: {
+		//gets All stores
 		async getStores() {
 			await this.$store.dispatch('store/GET_STORES');
 		},
+		//Selects the store to edit
 		editItem(item) {
 			this.editedItem = Object.assign({}, item);
 			this.mode = 'save';
 		},
-
+		//Selects the store to delete
 		deleteItem(item) {
 			this.editedItem = Object.assign({}, item);
 			this.mode = 'remove';
 		},
+		//Deletes the store that is selected
 		async remove() {
 			this.$refs.form.resetValidation();
 			await this.$store.dispatch('store/REMOVE', this.editedItem);
 			this.reset();
 		},
+		//Resets all fields
 		reset() {
 			this.mode = 'save';
 			this.editedItem = {
@@ -208,6 +214,7 @@ export default {
 			this.uploads = 0;
 			//this.getStores();
 		},
+		//Saves the edited/new item to the database through the Vuex
 		save() {
 			if (this.$refs.form.validate()) {
 				this.$store.dispatch('store/SAVE', {
@@ -217,9 +224,11 @@ export default {
 				this.reset();
 			}
 		},
+		//Opens the system browser to select an image to upload
 		pickFile() {
 			this.$refs.image.click();
 		},
+		//Uploads the selected picture through the Vuex
 		async upload(event) {
 			let imageUrl = await this.$store.dispatch('UPLOAD', event);
 

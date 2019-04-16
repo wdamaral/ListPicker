@@ -263,6 +263,7 @@ module.exports = app => {
                     }, {
                         transacting: t
                     })
+                console.log(list.get('totalCost') * 1)
                 const transactionAmount = SITE_COST + (list.get('totalCost') * 1)
                 const takeMoney = removeMoney(transactionAmount, user.id, t)
                 const depositMoney = putMoney(transactionAmount, list.get('pickerId'), t)
@@ -348,7 +349,7 @@ module.exports = app => {
                 for (const listItem of list.related('listItems')) {
                     existsOrError(listItem.get('cost'), 'All items must have a price.')
                     existsOrError(listItem.get('qtyBought'), 'All items must have the quantity bought.')
-                    total += listItem.get('totalCost') * 1
+                    total += listItem.get('cost') * 1
                 }
                 existsOrError(list.get('receiptNumber'), 'Please, update the receipt number first.')
             } catch (msg) {
